@@ -210,6 +210,7 @@ int G4Setup(const int absorberactive = 0,
   // piston magnet
   make_piston("magpiston", g4Reco);
 
+	radius = 200;//yuhw
   //----------------------------------------
   // BLACKHOLE
   
