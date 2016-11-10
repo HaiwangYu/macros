@@ -322,6 +322,29 @@ void Svtx_Reco(int verbosity = 0)
   TF1 *corr = new TF1("corr","1.0/(1+0.00908642+5.91337e-05*x+-1.87201e-05*x*x+-3.31928e-06*x*x*x+1.03004e-07*x*x*x*x+-1.05111e-09*x*x*x*x*x)",0.0,40.0);
   PHG4SvtxMomentumRecal* recal = new PHG4SvtxMomentumRecal("PHG4SvtxMomentumRecal",corr);
   se->registerSubsystem(recal);
+
+  //------------------------
+  // Final Track Refitting
+  //------------------------
+  PHG4TrackKalmanFitter *kalman = new PHG4TrackKalmanFitter();
+  //kalman->set_detector_type(PHG4TrackKalmanFitter::MAPS_TPC);//MAPS_LADDERS_TPC, MAPS_TPC, MAPS_IT_TPC, MIE
+  //kalman->Verbosity(10);
+
+  kalman->set_mag_field_file_name("/phenix/upgrades/decadal/fieldmaps/sPHENIX.2d.root");
+  kalman->set_mag_field_re_scaling_factor(1.4/1.5);
+  kalman->set_output_mode(PHG4TrackKalmanFitter::MakeNewNode);//enum OutPutMode {MakeNewNode, OverwriteOriginalNode, DebugMode};
+  kalman->set_fit_primary_tracks(false);
+
+  kalman->set_track_fitting_alg_name("DafRef");// KalmanFitterRefTrack, KalmanFitter, DafSimple, DafRef
+  kalman->set_primary_pid_guess(13);
+  kalman->set_vertexing_method("avf-smoothing:1");//https://rave.hepforge.org/trac/wiki/RaveMethods
+
+  kalman->set_do_eval(true);
+  kalman->set_eval_filename("PHG4TrackKalmanFitter_eval.root");
+
+  kalman->set_do_evt_display(false);
+
+  se->registerSubsystem(kalman);
     
   //------------------
   // Track Projections
