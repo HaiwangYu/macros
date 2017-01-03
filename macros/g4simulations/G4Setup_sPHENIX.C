@@ -20,8 +20,8 @@ void G4Init(bool do_svtx = true,
     }  
   if (do_svtx)
     {
-      //gROOT->LoadMacro("G4_Svtx.C");                 // default MIE projections
-      gROOT->LoadMacro("G4_Svtx_maps+IT+tpc.C"); // Reference design for 2016 tracking review
+      gROOT->LoadMacro("G4_Svtx.C");                 // default MIE projections
+      //gROOT->LoadMacro("G4_Svtx_maps+IT+tpc.C"); // Reference design for 2016 tracking review
       //gROOT->LoadMacro("G4_Svtx_pixels+strips.C"); // testing
       //gROOT->LoadMacro("G4_Svtx_pixels+tpc.C");    // testing
       //gROOT->LoadMacro("G4_Svtx_maps+strips.C");   // testing
@@ -90,6 +90,7 @@ int G4Setup(const int absorberactive = 0,
   Fun4AllServer *se = Fun4AllServer::instance();
 
   PHG4Reco* g4Reco = new PHG4Reco();
+	g4Reco->save_DST_geometry(true);
   g4Reco->set_rapidity_coverage(1.1); // according to drawings
   if (decayType != TPythia6Decayer::kAll) {
     g4Reco->set_force_decay(decayType);
