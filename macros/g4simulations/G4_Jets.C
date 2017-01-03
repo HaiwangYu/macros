@@ -7,7 +7,9 @@ void Jet_Reco(int verbosity = 0) {
 
   // truth particle level jets
   JetReco *truthjetreco = new JetReco();
-  truthjetreco->add_input(new TruthJetInput(Jet::PARTICLE));
+  TruthJetInput* truth_jet_input = new TruthJetInput(Jet::PARTICLE);
+  truth_jet_input->add_embedding_flag(10);
+  truthjetreco->add_input(truth_jet_input);
   truthjetreco->add_algo(new FastJetAlgo(Jet::ANTIKT,0.2),"AntiKt_Truth_r02");
   truthjetreco->add_algo(new FastJetAlgo(Jet::ANTIKT,0.3),"AntiKt_Truth_r03");
   truthjetreco->add_algo(new FastJetAlgo(Jet::ANTIKT,0.4),"AntiKt_Truth_r04");
