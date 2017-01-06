@@ -1,8 +1,10 @@
 int Fun4All_Embedding(
-		const int nEvents = 10,
+		const int nEvents = 2,
 		const char * inputFile = NULL,
 		const char * outputFile = "SvtxTracks.root",
-		const char * embed_input_file = "Hijing_G4Hits.root"
+		const char * embed_input_file = "Hijing_G4Hits.root",
+		const int which_tracking = 1,
+		const bool do_embedding = false
 		)
 {
 	//===============
@@ -32,7 +34,7 @@ int Fun4All_Embedding(
 	// Further choose to embed newly simulated events to a previous simulation. Not compatible with `readhits = true`
 	// In case embedding into a production output, please double check your G4Setup_sPHENIX.C and G4_*.C consistent with those in the production macro folder
 	// E.g. /sphenix/sim//sim01/production/2016-07-21/single_particle/spacal2d/
-	const bool do_embedding = true;
+	//const bool do_embedding = true;
 
 	//======================
 	// What to run
@@ -45,7 +47,7 @@ int Fun4All_Embedding(
 	bool do_svtx = true;
 	bool do_svtx_cell = do_svtx && true;
 	bool do_svtx_track = do_svtx_cell && true;
-	bool do_svtx_eval = do_svtx_track && true;
+	bool do_svtx_eval = do_svtx_track && false;
 
 	bool do_preshower = false;
 
@@ -93,7 +95,7 @@ int Fun4All_Embedding(
 
 	// establish the geometry and reconstruction setup
 	gROOT->LoadMacro("G4Setup_sPHENIX.C");
-	G4Init(do_svtx,do_preshower,do_cemc,do_hcalin,do_magnet,do_hcalout,do_pipe);
+	G4Init(do_svtx,do_preshower,do_cemc,do_hcalin,do_magnet,do_hcalout,do_pipe,which_tracking);
 
 	int absorberactive = 1; // set to 1 to make all absorbers active volumes
 	//  const string magfield = "1.5"; // if like float -> solenoidal field in T, if string use as fieldmap name (including path)
@@ -147,7 +149,7 @@ int Fun4All_Embedding(
 
 		PHPy8JetTrigger *theTrigger = new PHPy8JetTrigger();
 		//theTrigger->Verbosity(10);
-		theTrigger->SetEtaHighLow(-1, 1); 
+		theTrigger->SetEtaHighLow(-0.6, 0.6); 
 		theTrigger->SetJetR(.4);
 		theTrigger->SetMinJetPt(20);
 
@@ -241,19 +243,6 @@ int Fun4All_Embedding(
 				do_svtx, do_preshower, do_cemc, do_hcalin, do_magnet, do_hcalout, do_pipe, magfield_rescale);
 	}
 
-	// HF jet trigger moudle
-	assert (gSystem->Load("libHFJetTruthGeneration") == 0); 
-	{
-		if (do_jet_reco)
-		{   
-			HFJetTruthTrigger * jt = new HFJetTruthTrigger(
-					"HFJetTruthTrigger.root", 5 , "AntiKt_Truth_r04");
-			//jt->Verbosity(HFJetTruthTrigger::VERBOSITY_MORE);
-			jt->set_pt_min(20);
-			se->registerSubsystem(jt);
-		}   
-	}
-
 	//---------
 	// BBC Reco
 	//---------
@@ -326,6 +315,20 @@ int Fun4All_Embedding(
 		gROOT->LoadMacro("G4_Jets.C");
 		Jet_Reco();
 	}
+
+	// HF jet trigger moudle
+	assert (gSystem->Load("libHFJetTruthGeneration") == 0); 
+	{
+		if (do_jet_reco)
+		{   
+			HFJetTruthTrigger * jt = new HFJetTruthTrigger(
+					"HFJetTruthTrigger.root", 5 , "AntiKt_Truth_r04");
+			//jt->Verbosity(HFJetTruthTrigger::VERBOSITY_MORE);
+			jt->set_pt_min(20);
+			se->registerSubsystem(jt);
+		}   
+	}
+
 	//----------------------
 	// Simulation evaluation
 	//----------------------

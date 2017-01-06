@@ -2,7 +2,8 @@ int Fun4All_Hijing(
 		const int nEvents = 1,
 		const char * inputFile = "/sphenix/user/belmonrj/HIJING_a/hijing_00005.txt.bz2",
 		const char * outputFile = "Hijing_G4Hits.root",
-		const char * embed_input_file = NULL
+		const char * embed_input_file = NULL,
+		const int which_tracking = 0
 		)
 {
 	//===============
@@ -93,7 +94,7 @@ int Fun4All_Hijing(
 
 	// establish the geometry and reconstruction setup
 	gROOT->LoadMacro("G4Setup_sPHENIX.C");
-	G4Init(do_svtx,do_preshower,do_cemc,do_hcalin,do_magnet,do_hcalout,do_pipe);
+	G4Init(do_svtx,do_preshower,do_cemc,do_hcalin,do_magnet,do_hcalout,do_pipe,which_tracking);
 
 	int absorberactive = 1; // set to 1 to make all absorbers active volumes
 	//  const string magfield = "1.5"; // if like float -> solenoidal field in T, if string use as fieldmap name (including path)

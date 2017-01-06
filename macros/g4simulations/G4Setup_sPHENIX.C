@@ -8,7 +8,8 @@ void G4Init(bool do_svtx = true,
 	    bool do_hcalin = true,
 	    bool do_magnet = true,
 	    bool do_hcalout = true,
-	    bool do_pipe = true)
+	    bool do_pipe = true,
+			int which_tracking = 0)
   {
 
   // load detector/material macros and execute Init() function
@@ -20,15 +21,16 @@ void G4Init(bool do_svtx = true,
     }  
   if (do_svtx)
     {
-      gROOT->LoadMacro("G4_Svtx.C");                 // default MIE projections
-      //gROOT->LoadMacro("G4_Svtx_maps+IT+tpc.C"); // Reference design for 2016 tracking review
-      //gROOT->LoadMacro("G4_Svtx_pixels+strips.C"); // testing
-      //gROOT->LoadMacro("G4_Svtx_pixels+tpc.C");    // testing
-      //gROOT->LoadMacro("G4_Svtx_maps+strips.C");   // testing
-      //gROOT->LoadMacro("G4_Svtx_maps+tpc.C");      // testing
-      //gROOT->LoadMacro("G4_Svtx_maps_7layers.C");  // testing
-      //gROOT->LoadMacro("G4_Svtx_maps_5layers.C");  // testing
-      //gROOT->LoadMacro("G4_Svtx_ladders.C");       // testing (new geometries)
+      if(which_tracking == 0) gROOT->LoadMacro("G4_Svtx.C");               // default MIE projections
+      if(which_tracking == 1) gROOT->LoadMacro("G4_Svtx_maps+IT+tpc.C"); 	 // Reference design for 2016 tracking review
+      if(which_tracking == 2) gROOT->LoadMacro("G4_Svtx_pixels+strips.C"); // testing
+      if(which_tracking == 3) gROOT->LoadMacro("G4_Svtx_pixels+tpc.C");    // testing
+      if(which_tracking == 4) gROOT->LoadMacro("G4_Svtx_maps+strips.C");   // testing
+      if(which_tracking == 5) gROOT->LoadMacro("G4_Svtx_maps+tpc.C");      // testing
+      if(which_tracking == 6) gROOT->LoadMacro("G4_Svtx_maps_7layers.C");  // testing
+      if(which_tracking == 7) gROOT->LoadMacro("G4_Svtx_maps_5layers.C");  // testing
+      if(which_tracking == 8) gROOT->LoadMacro("G4_Svtx_ladders.C");       // testing (new geometries)
+      if(which_tracking == 9) gROOT->LoadMacro("G4_Svtx_maps_7layers_large_pixel.C");  // testing
       SvtxInit();
     }
 
