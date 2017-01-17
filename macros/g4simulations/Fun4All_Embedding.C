@@ -71,7 +71,7 @@ int Fun4All_Embedding(
 	bool do_hcalout_cluster = do_hcalout_twr && true;
 	bool do_hcalout_eval = do_hcalout_cluster && true;
 
-	bool do_global = true;
+	bool do_global = false;
 	bool do_global_fastsim = false;
 
 	bool do_jet_reco = true;

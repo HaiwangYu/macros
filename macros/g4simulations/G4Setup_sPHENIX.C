@@ -31,6 +31,7 @@ void G4Init(bool do_svtx = true,
       if(which_tracking == 7) gROOT->LoadMacro("G4_Svtx_maps_5layers.C");  // testing
       if(which_tracking == 8) gROOT->LoadMacro("G4_Svtx_ladders.C");       // testing (new geometries)
       if(which_tracking == 9) gROOT->LoadMacro("G4_Svtx_maps_7layers_large_pixel.C");  // testing
+      if(which_tracking == 10) gROOT->LoadMacro("G4_Svtx_maps_ladders+intt_ladders+tpc.C");  // testing
       SvtxInit();
     }
 
