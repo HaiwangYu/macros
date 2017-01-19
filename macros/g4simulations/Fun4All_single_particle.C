@@ -1,4 +1,4 @@
-int Fun4All_Embedding(
+int Fun4All_single_particle (
 		const int nEvents = 2,
 		const char * inputFile = NULL,
 		const char * outputFile = "SvtxTracks.root",
@@ -24,7 +24,7 @@ int Fun4All_Embedding(
 	const bool readhepmc = false; // read HepMC files
 	// Or:
 	// Use pythia
-	const bool runpythia8 = true;
+	const bool runpythia8 = false;
 	const bool runpythia6 = false;
 	// else
 	// Use particle generator (default simple generator)
@@ -47,7 +47,7 @@ int Fun4All_Embedding(
 	bool do_svtx = true;
 	bool do_svtx_cell = do_svtx && true;
 	bool do_svtx_track = do_svtx_cell && true;
-	bool do_svtx_eval = do_svtx_track && false;
+	bool do_svtx_eval = do_svtx_track && true;
 
 	bool do_preshower = false;
 
@@ -178,7 +178,7 @@ int Fun4All_Embedding(
 	{
 		// toss low multiplicity dummy events
 		PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
-		gen->add_particles("e-",1); // mu+,e+,proton,pi+,Upsilon
+		gen->add_particles("pi+",1); // mu+,e+,proton,pi+,Upsilon
 		// gen->add_particles("e+",5); // mu-,e-,anti_proton,pi-
 		if (readhepmc || do_embedding)
 		{
@@ -191,14 +191,14 @@ int Fun4All_Embedding(
 					PHG4SimpleEventGenerator::Uniform,
 					PHG4SimpleEventGenerator::Uniform);
 			gen->set_vertex_distribution_mean(0.0, 0.0, 0.0);
-			gen->set_vertex_distribution_width(0.0, 0.0, 5.0);
+			gen->set_vertex_distribution_width(0.0, 0.0, 0.0);
 		}
 		gen->set_vertex_size_function(PHG4SimpleEventGenerator::Uniform);
 		gen->set_vertex_size_parameters(0.0, 0.0);
 		gen->set_eta_range(-0.5, 0.5);
 		gen->set_phi_range(-1.0 * TMath::Pi(), 1.0 * TMath::Pi());
-		gen->set_pt_range(0.1, 10.0);
-		gen->Embed(1);
+		gen->set_pt_range(40.0, 40.0);
+		gen->Embed(10);
 		gen->Verbosity(0);
 		if (! usegun)
 		{
@@ -317,17 +317,17 @@ int Fun4All_Embedding(
 	}
 
 	// HF jet trigger moudle
-	assert (gSystem->Load("libHFJetTruthGeneration") == 0); 
-	{
-		if (do_jet_reco)
-		{   
-			HFJetTruthTrigger * jt = new HFJetTruthTrigger(
-					"HFJetTruthTrigger.root", 5 , "AntiKt_Truth_r04");
-			//jt->Verbosity(HFJetTruthTrigger::VERBOSITY_MORE);
-			jt->set_pt_min(20);
-			se->registerSubsystem(jt);
-		}   
-	}
+	//assert (gSystem->Load("libHFJetTruthGeneration") == 0); 
+	//{
+	//	if (do_jet_reco)
+	//	{   
+	//		HFJetTruthTrigger * jt = new HFJetTruthTrigger(
+	//				"HFJetTruthTrigger.root", 5 , "AntiKt_Truth_r04");
+	//		//jt->Verbosity(HFJetTruthTrigger::VERBOSITY_MORE);
+	//		jt->set_pt_min(20);
+	//		se->registerSubsystem(jt);
+	//	}   
+	//}
 
 	//----------------------
 	// Simulation evaluation

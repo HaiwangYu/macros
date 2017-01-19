@@ -30,8 +30,8 @@ void RunGenFit(
 	//kalman->set_primary_pid_guess(211);
 	//kalman->set_vertexing_method("avf-smoothing:1");//https://rave.hepforge.org/trac/wiki/RaveMethods
 
-	//kalman->set_do_eval(true);
-	//kalman->set_eval_filename("PHG4TrackKalmanFitter_eval.root");
+	kalman->set_do_eval(true);
+	kalman->set_eval_filename("PHG4TrackKalmanFitter_eval.root");
 
 	//kalman->set_do_evt_display(true);
 

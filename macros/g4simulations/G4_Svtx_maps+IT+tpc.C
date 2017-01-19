@@ -229,7 +229,7 @@ void Svtx_Cells(int verbosity = 0)
   double tpc_cell_y = 0.17;
   
   // Main switch for TPC distortion
-  const bool do_tpc_distoration = true;
+  const bool do_tpc_distoration = false;
   PHG4TPCSpaceChargeDistortion* tpc_distortion = NULL;
   if (do_tpc_distoration) {
     if (inner_cage_radius != 20. && inner_cage_radius != 30.) {
