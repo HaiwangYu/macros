@@ -20,10 +20,14 @@ void RunGenFit(
 
 	PHG4TrackKalmanFitter *kalman = new PHG4TrackKalmanFitter();
 
+	kalman->Verbosity(10);
+
+	//kalman->set_cut_min_p_T(-0.1);
+
 	//MIE, MAPS_TPC, MAPS_IT_TPC, LADDER_MAPS_TPC, LADDER_MAPS_IT_TPC, LADDER_MAPS_LADDER_IT_TPC, MAPS_LADDER_IT_TPC
 	//kalman->set_detector_type(PHG4TrackKalmanFitter::LADDER_MAPS_LADDER_IT_TPC);
 
-	//kalman->set_output_mode(PHG4TrackKalmanFitter::MakeNewNode);//MakeNewNode, OverwriteOriginalNode, DebugMode
+	kalman->set_output_mode(PHG4TrackKalmanFitter::OverwriteOriginalNode);//MakeNewNode, OverwriteOriginalNode, DebugMode
 	//kalman->set_fit_primary_tracks(false);
 
 	//kalman->set_track_fitting_alg_name("DafRef");// KalmanFitterRefTrack, KalmanFitter, DafSimple, DafRef
