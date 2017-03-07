@@ -345,8 +345,6 @@ void Svtx_Reco(int verbosity = 0)
   // Truth Pattern Recognition
   //---------------------
   PHG4TruthPatRec* pat_rec = new PHG4TruthPatRec();
-  pat_rec->set_use_ladder_maps(false);
-  pat_rec->set_use_ladder_intt(false);
   se->registerSubsystem(pat_rec);
   
   //---------------------
