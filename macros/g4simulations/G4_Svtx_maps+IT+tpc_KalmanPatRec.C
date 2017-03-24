@@ -39,7 +39,7 @@ double Svtx(PHG4Reco* g4Reco, double radius,
 
   for (int ilayer=0;ilayer<n_ib_layer;++ilayer) {
     cyl = new PHG4CylinderSubsystem("SVTX", ilayer);
-    cyl->Verbosity(2);
+    cyl->Verbosity(0);
     radius = ib_rad[ilayer];
     cyl->set_double_param("radius",radius);
     //cyl->set_int_param("lengthviarapidity",0);
@@ -53,7 +53,7 @@ double Svtx(PHG4Reco* g4Reco, double radius,
     radius += ib_si_thickness[ilayer] + no_overlapp;
     
     cyl = new PHG4CylinderSubsystem("SVTXSUPPORT", ilayer);
-    cyl->Verbosity(2);
+    cyl->Verbosity(0);
     cyl->set_double_param("radius",radius);
     //cyl->set_int_param("lengthviarapidity",1);
     cyl->set_double_param("length",ib_length[ilayer]);
@@ -81,7 +81,7 @@ double Svtx(PHG4Reco* g4Reco, double radius,
 
   for (int ilayer=n_ib_layer;ilayer<n_intt_layer+n_ib_layer;++ilayer) {
     cyl = new PHG4CylinderSubsystem("SVTX", ilayer);
-    cyl->Verbosity(2);
+    cyl->Verbosity(0);
     radius = intt_rad[ilayer-n_ib_layer];
     cyl->set_double_param("radius",radius);
     cyl->set_int_param("lengthviarapidity",1);
@@ -95,7 +95,7 @@ double Svtx(PHG4Reco* g4Reco, double radius,
     radius += intt_si_thickness[ilayer-n_ib_layer] + no_overlapp;
     
     cyl = new PHG4CylinderSubsystem("SVTXSUPPORT", ilayer);
-    cyl->Verbosity(2);
+    cyl->Verbosity(0);
     cyl->set_double_param("radius",radius);
     cyl->set_int_param("lengthviarapidity",1);
     //cyl->set_double_param("length", intt_length[ilayer-n_ib_layer]);
@@ -121,7 +121,7 @@ double Svtx(PHG4Reco* g4Reco, double radius,
   double cage_thickness = 1.43 * n_rad_length_cage;
   
   cyl = new PHG4CylinderSubsystem("SVTXSUPPORT", n_ib_layer+n_intt_layer);
-  cyl->Verbosity(2);
+  cyl->Verbosity(0);
   cyl->set_double_param("radius",radius);
   cyl->set_int_param("lengthviarapidity",0);
   cyl->set_double_param("length",cage_length);
@@ -140,7 +140,7 @@ double Svtx(PHG4Reco* g4Reco, double radius,
 
   if (inner_readout_radius - radius > 0) {
     cyl = new PHG4CylinderSubsystem("SVTXSUPPORT", n_ib_layer + n_intt_layer+1);
-    cyl->Verbosity(2);
+    cyl->Verbosity(0);
     cyl->set_double_param("radius",radius);
     cyl->set_int_param("lengthviarapidity",0);
     cyl->set_double_param("length",cage_length);
@@ -159,7 +159,7 @@ double Svtx(PHG4Reco* g4Reco, double radius,
   
   for(int ilayer=n_ib_layer+n_intt_layer;ilayer<(n_ib_layer+n_intt_layer+npoints);++ilayer) {
     cyl = new PHG4CylinderSubsystem("SVTX", ilayer);
-    cyl->Verbosity(2);
+    cyl->Verbosity(0);
     cyl->set_double_param("radius",radius);
     cyl->set_int_param("lengthviarapidity",0);
     cyl->set_double_param("length",cage_length);
@@ -174,7 +174,7 @@ double Svtx(PHG4Reco* g4Reco, double radius,
 
   // outer field cage wall
   cyl = new PHG4CylinderSubsystem("SVTXSUPPORT", n_ib_layer+n_intt_layer+npoints);
-  cyl->Verbosity(2);
+  cyl->Verbosity(0);
   cyl->set_double_param("radius",radius);
   cyl->set_int_param("lengthviarapidity",0);
   cyl->set_double_param("length",cage_length);
@@ -342,20 +342,69 @@ void Svtx_Reco(int verbosity = 0)
   se->registerSubsystem( tpcclusterizer );
   
   //---------------------
+  // PHG4HoughTransformTPC
+  //---------------------
+//  PHG4HoughTransformTPC* hough = new PHG4HoughTransformTPC(Max_si_layer,Max_si_layer-30);
+//  hough->set_mag_field(1.4);
+//  hough->setPtRescaleFactor(1.00/0.993892);
+//  hough->set_use_vertex(true);
+//  hough->setRemoveHits(true);
+//  hough->setRejectGhosts(true);
+//  hough->set_min_pT(0.2);
+//  hough->set_chi2_cut_full( 2.0 );
+//  hough->set_chi2_cut_init( 2.0 );
+//
+//  hough->setBinScale(1.0);
+//  hough->setZBinScale(1.0);
+//
+//  hough->Verbosity(verbosity);
+
+  //---------------------
+  // PHG4HoughTransform
+  //---------------------
+  const int hough_layer = 6;
+  PHG4KalmanPatRec* hough = new PHG4KalmanPatRec(hough_layer, hough_layer);
+  hough->set_mag_field(1.4);
+  hough->Verbosity(10);
+  // ALICE ITS upgrade values for total thickness in X_0
+  hough->set_material(0, 0.003);
+  hough->set_material(1, 0.003);
+  hough->set_material(2, 0.003);
+  hough->set_material(3, 0.008);
+  hough->set_material(4, 0.008);
+  hough->set_material(5, 0.008);
+  hough->set_material(6, 0.008);
+  hough->setPtRescaleFactor(0.9972/1.00117);
+  hough->set_chi2_cut_init(5.0);// 5.0
+  hough->set_chi2_cut_fast(10.0, 50.0, 75.0); // 10.0, 50.0, 75.0
+  hough->set_chi2_cut_full(5.0);//5.0
+  hough->set_ca_chi2_cut(5.0);//5.0
+  hough->setMaxClusterError(3.0);//3.0
+  hough->setRejectGhosts(true);
+  hough->setRemoveHits(false);
+  hough->setCutOnDCA(true);
+
+  //int seeding_layer[] = {0, 1, 2, 7, 8, 17, 18, 37, 38, 47, 48};
+  int seeding_layer[] = {0, 1, 2, 3, 5, 7};
+  hough->set_seeding_layer(seeding_layer, hough_layer);
+
+  se->registerSubsystem( hough );
+
+  //---------------------
   // Truth Pattern Recognition
   //---------------------
-  PHG4TruthPatRec* pat_rec = new PHG4TruthPatRec();
-  se->registerSubsystem(pat_rec);
+//  PHG4TruthPatRec* pat_rec = new PHG4TruthPatRec();
+//  se->registerSubsystem(pat_rec);
   
   //---------------------
   // Kalman Filter
   //---------------------
-  PHG4TrackKalmanFitter* kalman = new PHG4TrackKalmanFitter();
-  kalman->set_output_mode(PHG4TrackKalmanFitter::OverwriteOriginalNode);//MakeNewNode, OverwriteOriginalNode, DebugMode
-  kalman->set_do_eval(true);
-  kalman->set_eval_filename("PHG4TrackKalmanFitter_eval.root");
-  kalman->set_do_evt_display(true);
-  se->registerSubsystem(kalman);
+//  PHG4TrackKalmanFitter* kalman = new PHG4TrackKalmanFitter();
+//  kalman->set_output_mode(PHG4TrackKalmanFitter::MakeNewNode);//MakeNewNode, OverwriteOriginalNode, DebugMode
+//  kalman->set_do_eval(true);
+//  kalman->set_eval_filename("PHG4TrackKalmanFitter_eval.root");
+//  kalman->set_do_evt_display(true);
+//  se->registerSubsystem(kalman);
     
   //------------------
   // Track Projections
@@ -409,7 +458,7 @@ void Svtx_Eval(std::string outputfile, int verbosity = 0)
   eval->do_cluster_eval(true);   // make cluster ntuple
   eval->do_g4hit_eval(false);     // make g4hit ntuple
   eval->do_hit_eval(false);         // make hit ntuple
-  eval->do_gpoint_eval(false);  
+  eval->do_gpoint_eval(false);
   //eval->scan_for_embedded(true);  // evaluator will only collect embedded tracks - it will also ignore decay tracks from embedded particles!
   eval->scan_for_embedded(false); // evaluator takes all tracks
   eval->Verbosity(verbosity);

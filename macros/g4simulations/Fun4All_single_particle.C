@@ -178,8 +178,9 @@ int Fun4All_single_particle (
 	{
 		// toss low multiplicity dummy events
 		PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
-		gen->add_particles("pi+",1); // mu+,e+,proton,pi+,Upsilon
-		// gen->add_particles("e+",5); // mu-,e-,anti_proton,pi-
+		// mu+,e+,proton,pi+,Upsilon
+		gen->add_particles("pi+",1);
+		//gen->add_particles("pi-",1);
 		if (readhepmc || do_embedding)
 		{
 			gen->set_reuse_existing_vertex(true);
@@ -427,6 +428,9 @@ int Fun4All_single_particle (
 	//-----
 
 	se->End();
+
+	//getchar();
+
 	std::cout << "All done" << std::endl;
 	delete se;
 	gSystem->Exit(0);
