@@ -390,9 +390,9 @@ int Fun4All_G4_fsPHENIX(
           );
     }
 
-  //Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", outputFile);
-  //if (do_dst_compress) DstCompress(out);
-  //se->registerOutputManager(out);
+  Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", outputFile);
+  if (do_dst_compress) DstCompress(out);
+  se->registerOutputManager(out);
 
   if (nEvents == 0 && !readhits && !readhepmc)
     {
