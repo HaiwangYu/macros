@@ -196,9 +196,11 @@ int Fun4All_single_particle (
 		}
 		gen->set_vertex_size_function(PHG4SimpleEventGenerator::Uniform);
 		gen->set_vertex_size_parameters(0.0, 0.0);
-		gen->set_eta_range(-0.5, 0.5);
-		gen->set_phi_range(-1.0 * TMath::Pi(), 1.0 * TMath::Pi());
-		gen->set_pt_range(0, 40);
+		//gen->set_eta_range(-0.5, 0.5);
+		//gen->set_phi_range(-1.0 * TMath::Pi(), 1.0 * TMath::Pi());
+		gen->set_eta_range(0, 0);
+		gen->set_phi_range(0, 0);
+		gen->set_pt_range(10, 10);
 		gen->Embed(10);
 		gen->Verbosity(0);
 		if (! usegun)

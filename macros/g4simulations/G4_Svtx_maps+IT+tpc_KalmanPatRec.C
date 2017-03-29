@@ -362,8 +362,8 @@ void Svtx_Reco(int verbosity = 0)
   //---------------------
   // PHG4HoughTransform
   //---------------------
-  const int hough_layer = 6;
-  PHG4KalmanPatRec* hough = new PHG4KalmanPatRec(hough_layer, hough_layer);
+  const int seeding_nlayer = 7;
+  PHG4KalmanPatRec* hough = new PHG4KalmanPatRec(seeding_nlayer, seeding_nlayer);
   hough->set_mag_field(1.4);
   hough->Verbosity(10);
   // ALICE ITS upgrade values for total thickness in X_0
@@ -385,8 +385,12 @@ void Svtx_Reco(int verbosity = 0)
   hough->setCutOnDCA(true);
 
   //int seeding_layer[] = {0, 1, 2, 7, 8, 17, 18, 37, 38, 47, 48};
-  int seeding_layer[] = {0, 1, 2, 3, 5, 7};
-  hough->set_seeding_layer(seeding_layer, hough_layer);
+  //int seeding_layer[] = {0, 1, 2, 3, 5, 7};
+  int seeding_layer[] = {0, 1, 2, 3, 4, 5, 6};
+  hough->set_seeding_layer(seeding_layer, seeding_nlayer);
+
+  hough->set_search_win_multiplier(100);
+
 
   se->registerSubsystem( hough );
 
