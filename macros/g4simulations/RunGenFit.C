@@ -27,7 +27,9 @@ void RunGenFit(
 	//MIE, MAPS_TPC, MAPS_IT_TPC, LADDER_MAPS_TPC, LADDER_MAPS_IT_TPC, LADDER_MAPS_LADDER_IT_TPC, MAPS_LADDER_IT_TPC
 	//kalman->set_detector_type(PHG4TrackKalmanFitter::LADDER_MAPS_LADDER_IT_TPC);
 
-	kalman->set_output_mode(PHG4TrackKalmanFitter::OverwriteOriginalNode);//MakeNewNode, OverwriteOriginalNode, DebugMode
+	//kalman->set_output_mode(PHG4TrackKalmanFitter::OverwriteOriginalNode);//MakeNewNode, OverwriteOriginalNode, DebugMode
+	kalman->set_over_write_svtxtrackmap(true);
+	kalman->set_over_write_svtxvertexmap(true);
 	//kalman->set_fit_primary_tracks(false);
 
 	//kalman->set_track_fitting_alg_name("DafRef");// KalmanFitterRefTrack, KalmanFitter, DafSimple, DafRef
