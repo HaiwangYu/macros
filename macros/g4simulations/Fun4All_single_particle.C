@@ -47,6 +47,8 @@ int Fun4All_single_particle (
 	bool do_svtx = true;
 	bool do_svtx_cell = do_svtx && true;
 	bool do_svtx_track = do_svtx_cell && true;
+	bool use_truth_pat_rec = do_svtx_track && true;
+	bool do_refit = do_svtx_track && true;
 	bool do_svtx_eval = do_svtx_track && true;
 
 	bool do_preshower = false;
@@ -178,8 +180,9 @@ int Fun4All_single_particle (
 	{
 		// toss low multiplicity dummy events
 		PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
-		gen->add_particles("pi+",1); // mu+,e+,proton,pi+,Upsilon
-		// gen->add_particles("e+",5); // mu-,e-,anti_proton,pi-
+		// mu+,e+,proton,pi+,Upsilon
+		gen->add_particles("pi+",10);
+		//gen->add_particles("pi-",1);
 		if (readhepmc || do_embedding)
 		{
 			gen->set_reuse_existing_vertex(true);
@@ -197,6 +200,8 @@ int Fun4All_single_particle (
 		gen->set_vertex_size_parameters(0.0, 0.0);
 		gen->set_eta_range(-0.5, 0.5);
 		gen->set_phi_range(-1.0 * TMath::Pi(), 1.0 * TMath::Pi());
+//		gen->set_eta_range(0, 0);
+//		gen->set_phi_range(0, 0);
 		gen->set_pt_range(0, 40);
 		gen->Embed(10);
 		gen->Verbosity(0);
@@ -288,7 +293,7 @@ int Fun4All_single_particle (
 	// SVTX tracking
 	//--------------
 
-	if (do_svtx_track) Svtx_Reco();
+	if (do_svtx_track) Svtx_Reco(0, use_truth_pat_rec, do_refit);
 
 	//-----------------
 	// Global Vertexing
@@ -427,6 +432,9 @@ int Fun4All_single_particle (
 	//-----
 
 	se->End();
+
+	//getchar();
+
 	std::cout << "All done" << std::endl;
 	delete se;
 	gSystem->Exit(0);

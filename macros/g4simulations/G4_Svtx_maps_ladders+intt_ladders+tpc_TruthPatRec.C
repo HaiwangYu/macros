@@ -250,7 +250,7 @@ void Svtx_Cells(int verbosity = 0)
   return;
 }
 
-void Svtx_Reco(int verbosity = 0)
+void Svtx_Reco(int verbosity = 0, bool use_truth_pat_rec = false, bool do_refit = false)
 {
   //---------------
   // Load libraries
@@ -369,35 +369,88 @@ void Svtx_Reco(int verbosity = 0)
   tpcclusterizer->Verbosity(verbosity);
   se->registerSubsystem( tpcclusterizer );
 
+  //---------------------
+  // Track reconstruction
+  //---------------------
 
-  //---------------------
-  // Truth Pattern Recognition
-  //---------------------
-  PHG4TruthPatRec* pat_rec = new PHG4TruthPatRec();
-  se->registerSubsystem(pat_rec);
-  
-  //---------------------
-  // Kalman Filter
-  //---------------------
-  PHG4TrackKalmanFitter* kalman = new PHG4TrackKalmanFitter();
-  kalman->set_output_mode(PHG4TrackKalmanFitter::OverwriteOriginalNode);//MakeNewNode, OverwriteOriginalNode, DebugMode
-  kalman->set_do_eval(true);
-  kalman->set_eval_filename("PHG4TrackKalmanFitter_eval.root");
-  se->registerSubsystem(kalman);
+	if (!use_truth_pat_rec) {
+		//---------------------
+		// PHG4HoughTransformTPC: Pattern recognition + Track Fitting + Vertexing
+		//---------------------
+		//PHG4HoughTransformTPC* hough = new PHG4HoughTransformTPC(Max_si_layer,Max_si_layer-20);
+		PHG4HoughTransformTPC* hough = new PHG4HoughTransformTPC(Max_si_layer,
+				Max_si_layer - 4);
+		hough->set_mag_field(1.4);
+		hough->setPtRescaleFactor(1.00 / 0.993892);
+		hough->set_use_vertex(true);
+		hough->setRemoveHits(true);
+		hough->setRejectGhosts(true);
+		hough->set_min_pT(0.2);
+		hough->set_chi2_cut_full(2.0);
+		hough->set_chi2_cut_init(2.0);
+
+		hough->setBinScale(1.0);
+		hough->setZBinScale(1.0);
+
+		hough->Verbosity(verbosity);
+
+		double mat_scale = 1.0;
+		for (int i = 0; i < n_maps_layer; i++) {
+			hough->set_material(i, mat_scale * 0.003); // consistent with matscan for MAPS ladders
+		}
+		for (int i = n_maps_layer; i < n_maps_layer + n_intt_layer; i++) {
+			hough->set_material(i, mat_scale * 0.019); // from matscan for INTT ladders
+		}
+
+		for (int i = (n_maps_layer + n_intt_layer); i < Max_si_layer; ++i) {
+			hough->set_material(i, mat_scale * 0.06 / n_gas_layer);
+		}
+		hough->setUseCellSize(true);
+
+		for (int i = n_maps_layer + n_intt_layer; i < Max_si_layer; ++i) {
+			hough->setFitErrorScale(i, 1. / sqrt(12.));
+		}
+		for (int i = n_maps_layer + n_intt_layer; i < Max_si_layer; ++i) {
+			hough->setVoteErrorScale(i, 1.0);
+		}
+		for (int i = 0; i < n_maps_layer + n_intt_layer; ++i) {
+			hough->setVoteErrorScale(i, 1.0);
+		}
+		for (int i = 0; i < n_maps_layer + n_intt_layer; ++i) {
+			hough->setFitErrorScale(i, 1. / sqrt(12.));
+		}
+
+		se->registerSubsystem(hough);
+	} else {
+
+		//---------------------
+		// Truth Pattern Recognition
+		//---------------------
+		PHG4TruthPatRec* pat_rec = new PHG4TruthPatRec();
+		se->registerSubsystem(pat_rec);
+	}
+
+	//---------------------
+	// GenFit2 based Kalman Filter
+	//---------------------
+	if (use_truth_pat_rec || do_refit) {
+		PHG4TrackKalmanFitter* kalman = new PHG4TrackKalmanFitter();
+		se->registerSubsystem(kalman);
+	}
   
   //------------------
   // Track Projections
   //------------------
-//  PHG4SvtxTrackProjection* projection = new PHG4SvtxTrackProjection();
-//  projection->Verbosity(verbosity);
-//  se->registerSubsystem( projection );
+  PHG4SvtxTrackProjection* projection = new PHG4SvtxTrackProjection();
+  projection->Verbosity(verbosity);
+  se->registerSubsystem( projection );
 
   //----------------------
   // Beam Spot Calculation
   //----------------------
-//  PHG4SvtxBeamSpotReco* beamspot = new PHG4SvtxBeamSpotReco();
-//  beamspot->Verbosity(verbosity);
-//  se->registerSubsystem( beamspot );
+  PHG4SvtxBeamSpotReco* beamspot = new PHG4SvtxBeamSpotReco();
+  beamspot->Verbosity(verbosity);
+  se->registerSubsystem( beamspot );
 
   return;
 }
