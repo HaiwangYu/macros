@@ -179,8 +179,9 @@ int Fun4All_single_particle (
 		// toss low multiplicity dummy events
 		PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
 		// mu+,e+,proton,pi+,Upsilon
-		gen->add_particles("pi+",1);
-		//gen->add_particles("pi-",1);
+//		gen->add_particles("mu+",1);
+		gen->add_particles("pi+",100);
+		gen->add_particles("pi-",100);
 		if (readhepmc || do_embedding)
 		{
 			gen->set_reuse_existing_vertex(true);
@@ -200,7 +201,7 @@ int Fun4All_single_particle (
 		gen->set_phi_range(-1.0 * TMath::Pi(), 1.0 * TMath::Pi());
 //		gen->set_eta_range(0, 0);
 //		gen->set_phi_range(0, 0);
-		gen->set_pt_range(10, 10);
+		gen->set_pt_range(1, 10);
 		gen->Embed(10);
 		gen->Verbosity(0);
 		if (! usegun)

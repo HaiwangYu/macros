@@ -363,36 +363,37 @@ void Svtx_Reco(int verbosity = 0)
   // PHG4HoughTransform
   //---------------------
   const int seeding_nlayer = 7;
-  PHG4KalmanPatRec* hough = new PHG4KalmanPatRec(seeding_nlayer, seeding_nlayer);
-  hough->set_mag_field(1.4);
-  hough->Verbosity(10);
+  PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec(seeding_nlayer, seeding_nlayer);
+  kalman_pat_rec->set_mag_field(1.4);
+  kalman_pat_rec->Verbosity(10);
   // ALICE ITS upgrade values for total thickness in X_0
-  hough->set_material(0, 0.003);
-  hough->set_material(1, 0.003);
-  hough->set_material(2, 0.003);
-  hough->set_material(3, 0.008);
-  hough->set_material(4, 0.008);
-  hough->set_material(5, 0.008);
-  hough->set_material(6, 0.008);
-  hough->setPtRescaleFactor(0.9972/1.00117);
-  hough->set_chi2_cut_init(5.0);// 5.0
-  hough->set_chi2_cut_fast(10.0, 50.0, 75.0); // 10.0, 50.0, 75.0
-  hough->set_chi2_cut_full(5.0);//5.0
-  hough->set_ca_chi2_cut(5.0);//5.0
-  hough->setMaxClusterError(3.0);//3.0
-  hough->setRejectGhosts(true);
-  hough->setRemoveHits(false);
-  hough->setCutOnDCA(true);
+  kalman_pat_rec->set_material(0, 0.003);
+  kalman_pat_rec->set_material(1, 0.003);
+  kalman_pat_rec->set_material(2, 0.003);
+  kalman_pat_rec->set_material(3, 0.008);
+  kalman_pat_rec->set_material(4, 0.008);
+  kalman_pat_rec->set_material(5, 0.008);
+  kalman_pat_rec->set_material(6, 0.008);
+  kalman_pat_rec->setPtRescaleFactor(0.9972/1.00117);
+  kalman_pat_rec->set_chi2_cut_init(5.0);// 5.0
+  kalman_pat_rec->set_chi2_cut_fast(10.0, 50.0, 75.0); // 10.0, 50.0, 75.0
+  kalman_pat_rec->set_chi2_cut_full(5.0);//5.0
+  kalman_pat_rec->set_ca_chi2_cut(5.0);//5.0
+  kalman_pat_rec->setMaxClusterError(3.0);//3.0
+  kalman_pat_rec->setRejectGhosts(true);
+  kalman_pat_rec->setRemoveHits(false);
+  kalman_pat_rec->setCutOnDCA(true);
 
   //int seeding_layer[] = {0, 1, 2, 7, 8, 17, 18, 37, 38, 47, 48};
   //int seeding_layer[] = {0, 1, 2, 3, 5, 7};
   int seeding_layer[] = {0, 1, 2, 3, 4, 5, 6};
-  hough->set_seeding_layer(seeding_layer, seeding_nlayer);
+  kalman_pat_rec->set_seeding_layer(seeding_layer, seeding_nlayer);
 
-  hough->set_search_win_multiplier(100);
+  kalman_pat_rec->set_search_win_multiplier(3);
+  kalman_pat_rec->set_do_evt_display(false);
 
 
-  se->registerSubsystem( hough );
+  se->registerSubsystem( kalman_pat_rec );
 
   //---------------------
   // Truth Pattern Recognition
