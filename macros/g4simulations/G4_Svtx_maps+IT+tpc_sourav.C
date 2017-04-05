@@ -1,7 +1,11 @@
 
-const int n_ib_layer = 3;   // number of maps inner barrel layers
-const int n_intt_layer = 4; // number of int. tracker layers. Make this number 0 to use MAPS + TPC only.
-const int n_gas_layer = 60; // number of TPC layers
+const int n_ib_layer = 3;
+//const int n_ib_layer = 0;
+const int n_intt_layer = 4;
+//const int n_intt_layer = 0;
+//const int n_gas_layer = 60;
+//const int n_gas_layer = 30;
+const int n_gas_layer = 40;
 double inner_cage_radius = 20.;
 
 int Min_si_layer = 0;
@@ -39,7 +43,7 @@ double Svtx(PHG4Reco* g4Reco, double radius,
 
   for (int ilayer=0;ilayer<n_ib_layer;++ilayer) {
     cyl = new PHG4CylinderSubsystem("SVTX", ilayer);
-    cyl->Verbosity(2);
+    cyl->Verbosity(0);
     radius = ib_rad[ilayer];
     cyl->set_double_param("radius",radius);
     //cyl->set_int_param("lengthviarapidity",0);
@@ -53,7 +57,7 @@ double Svtx(PHG4Reco* g4Reco, double radius,
     radius += ib_si_thickness[ilayer] + no_overlapp;
     
     cyl = new PHG4CylinderSubsystem("SVTXSUPPORT", ilayer);
-    cyl->Verbosity(2);
+    cyl->Verbosity(0);
     cyl->set_double_param("radius",radius);
     //cyl->set_int_param("lengthviarapidity",1);
     cyl->set_double_param("length",ib_length[ilayer]);
@@ -81,7 +85,7 @@ double Svtx(PHG4Reco* g4Reco, double radius,
 
   for (int ilayer=n_ib_layer;ilayer<n_intt_layer+n_ib_layer;++ilayer) {
     cyl = new PHG4CylinderSubsystem("SVTX", ilayer);
-    cyl->Verbosity(2);
+    cyl->Verbosity(0);
     radius = intt_rad[ilayer-n_ib_layer];
     cyl->set_double_param("radius",radius);
     cyl->set_int_param("lengthviarapidity",1);
@@ -95,7 +99,7 @@ double Svtx(PHG4Reco* g4Reco, double radius,
     radius += intt_si_thickness[ilayer-n_ib_layer] + no_overlapp;
     
     cyl = new PHG4CylinderSubsystem("SVTXSUPPORT", ilayer);
-    cyl->Verbosity(2);
+    cyl->Verbosity(0);
     cyl->set_double_param("radius",radius);
     cyl->set_int_param("lengthviarapidity",1);
     //cyl->set_double_param("length", intt_length[ilayer-n_ib_layer]);
@@ -117,11 +121,11 @@ double Svtx(PHG4Reco* g4Reco, double radius,
   radius = inner_cage_radius;
   
   double n_rad_length_cage = 1.0e-02;
-  double cage_length = 160.; // rough length from Tom, also used in charge distortion calculation
+  double cage_length = /*160.*/211.; // rough length from Tom, also used in charge distortion calculation
   double cage_thickness = 1.43 * n_rad_length_cage;
   
   cyl = new PHG4CylinderSubsystem("SVTXSUPPORT", n_ib_layer+n_intt_layer);
-  cyl->Verbosity(2);
+  cyl->Verbosity(0);
   cyl->set_double_param("radius",radius);
   cyl->set_int_param("lengthviarapidity",0);
   cyl->set_double_param("length",cage_length);
@@ -132,15 +136,15 @@ double Svtx(PHG4Reco* g4Reco, double radius,
 
   radius += cage_thickness;
 
-  // TPC gas material in region not read out
-  double inner_readout_radius = 30.;
+  // TPC gas layers
+  double inner_readout_radius = /*30.*/31.5;
   if (inner_readout_radius<radius)  inner_readout_radius = radius;
 
   string tpcgas = "G4_Ar";
 
   if (inner_readout_radius - radius > 0) {
     cyl = new PHG4CylinderSubsystem("SVTXSUPPORT", n_ib_layer + n_intt_layer+1);
-    cyl->Verbosity(2);
+    cyl->Verbosity(0);
     cyl->set_double_param("radius",radius);
     cyl->set_int_param("lengthviarapidity",0);
     cyl->set_double_param("length",cage_length);
@@ -151,15 +155,14 @@ double Svtx(PHG4Reco* g4Reco, double radius,
   }
 
   radius = inner_readout_radius;
-
-  // Active TPC gas layers  
-  double outer_radius = 80.; // should be 78 cm, right?
+  
+  double outer_radius = 75./*80.*//*78.*/; // should be 78 cm, right?
   int npoints = Max_si_layer - n_ib_layer-n_intt_layer;
   double delta_radius =  ( outer_radius - inner_readout_radius )/( (double)npoints );
   
   for(int ilayer=n_ib_layer+n_intt_layer;ilayer<(n_ib_layer+n_intt_layer+npoints);++ilayer) {
     cyl = new PHG4CylinderSubsystem("SVTX", ilayer);
-    cyl->Verbosity(2);
+    cyl->Verbosity(0);
     cyl->set_double_param("radius",radius);
     cyl->set_int_param("lengthviarapidity",0);
     cyl->set_double_param("length",cage_length);
@@ -174,7 +177,7 @@ double Svtx(PHG4Reco* g4Reco, double radius,
 
   // outer field cage wall
   cyl = new PHG4CylinderSubsystem("SVTXSUPPORT", n_ib_layer+n_intt_layer+npoints);
-  cyl->Verbosity(2);
+  cyl->Verbosity(0);
   cyl->set_double_param("radius",radius);
   cyl->set_int_param("lengthviarapidity",0);
   cyl->set_double_param("length",cage_length);
@@ -198,7 +201,11 @@ void Svtx_Cells(int verbosity = 0)
   //---------------
 
   gSystem->Load("libfun4all.so");
-  gSystem->Load("libg4detectors.so");
+  //gSystem->Load("libg4detectors.so");
+  //gSystem->Load("/sphenix/user/isibf5y/install_g4hitrecal_g4det/lib/libg4detectors.so");
+  //gSystem->Load("/sphenix/user/isibf5y/install_g4det_g4hitmod/lib/libg4detectors.so");
+  gSystem->Load("/sphenix/user/isibf5y/install_g4det_new/lib/libg4detectors.so");
+  
 
   //---------------
   // Fun4All server
@@ -219,17 +226,17 @@ void Svtx_Cells(int verbosity = 0)
   double intt_cellsizey[4] = { 1.2, 1.2, 1.2, 1.2}; // cm
 
   // TPC
-  double diffusion = 0.0057;
-  double electrons_per_kev = 38.;
+  double diffusion = /*0.0057*//*0.01/*0.007*/0.0135/* 0.0131*/;
+  double electrons_per_kev =  /*38.*/28.;
   
   // tpc_cell_x is the TPC pad size.  The actual hit resolution depends not only on this pad size but also on the diffusion in the gas and amplification step
-  double tpc_cell_x = 0.12;
+  double tpc_cell_x = 0.12/*0.175*/;
   // tpc_cell_y is the z "bin" size.  It is approximately the z resolution * sqrt(12)
   // eventually this will be replaced with an actual simulation of timing amplitude.
   double tpc_cell_y = 0.17;
   
   // Main switch for TPC distortion
-  const bool do_tpc_distoration = false;
+  const bool do_tpc_distoration = /*true */false;
   PHG4TPCSpaceChargeDistortion* tpc_distortion = NULL;
   if (do_tpc_distoration) {
     if (inner_cage_radius != 20. && inner_cage_radius != 30.) {
@@ -280,6 +287,8 @@ void Svtx_Reco(int verbosity = 0)
 
   gSystem->Load("libfun4all.so");
   gSystem->Load("libg4hough.so");
+  //gSystem->Load("/sphenix/user/isibf5y/install_g4hitrecal_g4det/lib/libg4hough.so");
+  
 
   //---------------
   // Fun4All server
@@ -338,43 +347,66 @@ void Svtx_Reco(int verbosity = 0)
   se->registerSubsystem( clusterizer );
   
   PHG4TPCClusterizer* tpcclusterizer = new PHG4TPCClusterizer("PHG4TPCClusterizer",3,4,n_ib_layer+n_intt_layer,Max_si_layer);
-  tpcclusterizer->setEnergyCut(20.0*45.0/n_gas_layer);
+  
+  //tpcclusterizer->setEnergyCut(20.0*45.0/n_gas_layer); // default
+  //tpcclusterizer->setEnergyCut(15.); // For default gas with 40 layers, kept same as for default gas with 60 layers
+  //tpcclusterizer->setEnergyCut(0.);
+  //tpcclusterizer->setEnergyCut(10.0*45.0/n_gas_layer); // try with Ne2K gas, tpc gas layer = 60, will work with 30 and 40 layers
+  //tpcclusterizer->setEnergyCut(45.0/n_gas_layer); // try with Ne2K gas, tpc gas layer = 30, too low
+  //tpcclusterizer->setEnergyCut(15); // For T2K gas , 40 layers
+  tpcclusterizer->setEnergyCut(10); // For Ne2K gas , 40 laters
   se->registerSubsystem( tpcclusterizer );
   
   //---------------------
   // Track reconstruction
   //---------------------
-  PHG4HoughTransformTPC* hough = new PHG4HoughTransformTPC(Max_si_layer,Max_si_layer-30);
+  //When using tpc gas layer = 60
+  //PHG4HoughTransformTPC* hough = new PHG4HoughTransformTPC(Max_si_layer,Max_si_layer-30);
+  //PHG4HoughTransformTPC* hough = new PHG4HoughTransformTPC(Max_si_layer,Max_si_layer-40);
+  //PHG4HoughTransformTPC* hough = new PHG4HoughTransformTPC(Max_si_layer,Max_si_layer-6);
+
+  //Using TPC gas layer = 30
+  //PHG4HoughTransformTPC* hough = new PHG4HoughTransformTPC(Max_si_layer,Max_si_layer-17);
+
+   //Using TPC gas layer = 40
+  PHG4HoughTransformTPC* hough = new PHG4HoughTransformTPC(Max_si_layer,Max_si_layer-21);
+
   hough->set_mag_field(1.4);
   hough->setPtRescaleFactor(1.00/0.993892);
   hough->set_use_vertex(true);
   hough->setRemoveHits(true);
   hough->setRejectGhosts(true);
   hough->set_min_pT(0.2);
+  // default
   hough->set_chi2_cut_full( 2.0 );
   hough->set_chi2_cut_init( 2.0 );
-
+  
+  /*
+  //check with Ne2K
+  hough->set_chi2_cut_full( 4.0 );
+  hough->set_chi2_cut_init( 4.0 );
+  */
   hough->setBinScale(1.0);
   hough->setZBinScale(1.0);
 
   hough->Verbosity(verbosity);
+  //hough->Verbosity(21); // printing out the cluster size
 
   double mat_scale = 1.0;
-  // maps inner barrel, total of 0.3% of X_0 per layer
+  // maps inner barrel, total of 0.3% of X_0
   for(int i=0;i<n_ib_layer;i++)
     hough->set_material(i, mat_scale*0.003);
-  // intermediate tracker, total 1% of X_0 pair layer
+  // intermediate tracker, total 1% of X_0
   for(int i=n_ib_layer;i<n_ib_layer+n_intt_layer;i++)
     hough->set_material(i-n_ib_layer, mat_scale*0.010);
   // TPC inner field cage wall, 1% of X_0
   hough->set_material(n_ib_layer+n_intt_layer, mat_scale*0.010);
-  // material for inactive gas region here?
   // TPC gas
   for (int i=(n_ib_layer+n_intt_layer+1);i<Max_si_layer;++i) {
     hough->set_material(i, mat_scale*0.06/n_gas_layer);
   }
   hough->setUseCellSize(true);
-
+  
   // TPC
   for (int i=n_ib_layer+n_intt_layer;i<Max_si_layer;++i) {
     hough->setFitErrorScale(i, 1./sqrt(12.));
@@ -433,8 +465,11 @@ void Svtx_Eval(std::string outputfile, int verbosity = 0)
   //---------------
 
   gSystem->Load("libfun4all.so");
-  gSystem->Load("libg4detectors.so");
+  gSystem->Load("/sphenix/user/isibf5y/install_g4det_new/lib/libg4detectors.so");
+  //gSystem->Load("/sphenix/user/isibf5y/install_g4hitrecal_g4det/lib/libg4detectors.so");
+  //gSystem->Load("/sphenix/user/isibf5y/install_g4det_g4hitmod/lib/libg4detectors.so"); 
   gSystem->Load("libg4hough.so");
+  //gSystem->Load("/sphenix/user/isibf5y/install_g4hitrecal_g4det/lib/libg4hough.so");
   gSystem->Load("libg4eval.so");
 
   //---------------
@@ -448,12 +483,12 @@ void Svtx_Eval(std::string outputfile, int verbosity = 0)
   //----------------
 
   SvtxEvaluator* eval = new SvtxEvaluator("SVTXEVALUATOR", outputfile.c_str());
-  eval->do_cluster_eval(true);   // make cluster ntuple
-  eval->do_g4hit_eval(false);     // make g4hit ntuple
-  eval->do_hit_eval(false);         // make hit ntuple
-  eval->do_gpoint_eval(false);  
-  //eval->scan_for_embedded(true);  // evaluator will only collect embedded tracks - it will also ignore decay tracks from embedded particles!
-  eval->scan_for_embedded(false); // evaluator takes all tracks
+  eval->do_cluster_eval(true);
+  eval->do_g4hit_eval(true);
+  eval->do_hit_eval(false);
+  eval->do_gpoint_eval(false);
+  eval->scan_for_embedded(true);  // evaluator will only collect embedded tracks - it will ignore decay tracks!
+  //eval->scan_for_embedded(false); // evaluator takes all tracks
   eval->Verbosity(verbosity);
   se->registerSubsystem( eval );
 

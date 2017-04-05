@@ -111,16 +111,15 @@ G4DSTreader( const char * outputFile = "G4sPHENIXCells.root",//
     }
 
   // Jets disabled for now
-//  if (do_jet_reco)
-//    {
-//
-//      ana->AddJet("AntiKt06JetsInPerfect");
-//      ana->AddJet("G4TowerJets_6");
-//    }
-//  if (embed_input_file && do_jet_reco)
-//    {
-//      ana->AddJet("G4TowerJets_combined_6");
-//    }
+	bool do_jet_reco = true;
+  if (do_jet_reco)
+    {
+      ana->AddJet("AntiKt_Truth_r04");
+    }
+  //if (embed_input_file && do_jet_reco)
+  //  {
+  //    ana->AddJet("G4TowerJets_combined_6");
+  //  }
 
   Fun4AllServer *se = Fun4AllServer::instance();
   se->registerSubsystem(ana);

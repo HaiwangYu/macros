@@ -4,9 +4,9 @@ int Max_cemc_layer = 1;
 
   // set a default value for SPACAL configuration
 //  // 1D azimuthal projective SPACAL (fast)
-int Cemc_spacal_configuration = PHG4CylinderGeom_Spacalv1::k1DProjectiveSpacal;
+//int Cemc_spacal_configuration = PHG4CylinderGeom_Spacalv1::k1DProjectiveSpacal;
 //   2D azimuthal projective SPACAL (slow)
-// int Cemc_spacal_configuration = PHG4CylinderGeom_Spacalv1::k2DProjectiveSpacal;
+ int Cemc_spacal_configuration = PHG4CylinderGeom_Spacalv1::k2DProjectiveSpacal;
 
 #include <iostream>
 
@@ -149,6 +149,9 @@ CEmc_2DProjectiveSpacal(PHG4Reco* g4Reco, double radius, const int crossings,
   //---------------
 
   gSystem->Load("libg4detectors.so");
+
+  cout <<"CEmc_2DProjectiveSpacal - WARNING - disable DST geometry export for 2D SPACAL to speed up"<<endl;
+  g4Reco->save_DST_geometry(false);
 
   // the radii are only to determined the thickness of the cemc
   radius = emc_inner_radius;
@@ -384,9 +387,8 @@ void CEMC_Cells(int verbosity = 0) {
 //          cemc_cells->etaphisize(i, 0.024, 0.024);
           const double radius = 95;
           cemc_cells->cellsize(i,  2*TMath::Pi()/256. * radius, 2*TMath::Pi()/256. * radius);
-	  cemc_cells->set_double_param(i,"tmin",0.);
-	  cemc_cells->set_double_param(i,"tmax",60.);
       }
+      cemc_cells->set_timing_window_defaults(0.0,60.0);
       se->registerSubsystem(cemc_cells);
 
     }
@@ -396,7 +398,7 @@ void CEMC_Cells(int verbosity = 0) {
       PHG4FullProjSpacalCellReco *cemc_cells = new PHG4FullProjSpacalCellReco("CEMCCYLCELLRECO");
       cemc_cells->Detector("CEMC");
       cemc_cells->Verbosity(verbosity);
-      cemc_cells->set_timing_window(0.0,60.0);
+      cemc_cells->set_timing_window_defaults(0.0,60.0);
       se->registerSubsystem(cemc_cells);
 
     }
@@ -451,7 +453,7 @@ void CEMC_Towers(int verbosity = 0) {
   RawTowerDigitizer *TowerDigitizer = new RawTowerDigitizer("EmcRawTowerDigitizer");
   TowerDigitizer->Detector("CEMC");
   TowerDigitizer->Verbosity(verbosity);
-  TowerDigitizer->set_digi_algorithm(RawTowerDigitizer::kSimple_photon_digitization);
+  TowerDigitizer->set_digi_algorithm(RawTowerDigitizer::kSimple_photon_digitalization);
   TowerDigitizer->set_pedstal_central_ADC(0);
   TowerDigitizer->set_pedstal_width_ADC(8);// eRD1 test beam setting
   TowerDigitizer->set_photonelec_ADC(1);//not simulating ADC discretization error
