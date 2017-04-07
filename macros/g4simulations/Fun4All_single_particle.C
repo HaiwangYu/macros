@@ -180,8 +180,8 @@ int Fun4All_single_particle (
 		PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
 		// mu+,e+,proton,pi+,Upsilon
 //		gen->add_particles("mu+",1);
-		gen->add_particles("pi+",100);
-		gen->add_particles("pi-",100);
+		gen->add_particles("pi+",500);
+		gen->add_particles("pi-",500);
 		if (readhepmc || do_embedding)
 		{
 			gen->set_reuse_existing_vertex(true);

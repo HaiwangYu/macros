@@ -362,10 +362,16 @@ void Svtx_Reco(int verbosity = 0)
   //---------------------
   // PHG4HoughTransform
   //---------------------
-  const int seeding_nlayer = 7;
+  const int seeding_nlayer = 8;
+  //int seeding_layer[] = {0, 1, 2, 7, 8, 17, 18, 37, 38, 47, 48};
+  //int seeding_layer[] = {0, 1, 2, 3, 5, 7};
+  int seeding_layer[] = {0, 1, 2, 3, 4, 5, 6, 7};
+
   PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec(seeding_nlayer, seeding_nlayer);
+  kalman_pat_rec->set_seeding_layer(seeding_layer, seeding_nlayer);
+
   kalman_pat_rec->set_mag_field(1.4);
-  kalman_pat_rec->Verbosity(10);
+  kalman_pat_rec->Verbosity(100);
   // ALICE ITS upgrade values for total thickness in X_0
   kalman_pat_rec->set_material(0, 0.003);
   kalman_pat_rec->set_material(1, 0.003);
@@ -384,12 +390,10 @@ void Svtx_Reco(int verbosity = 0)
   kalman_pat_rec->setRemoveHits(false);
   kalman_pat_rec->setCutOnDCA(true);
 
-  //int seeding_layer[] = {0, 1, 2, 7, 8, 17, 18, 37, 38, 47, 48};
-  //int seeding_layer[] = {0, 1, 2, 3, 5, 7};
-  int seeding_layer[] = {0, 1, 2, 3, 4, 5, 6};
-  kalman_pat_rec->set_seeding_layer(seeding_layer, seeding_nlayer);
 
-  kalman_pat_rec->set_search_win_multiplier(3);
+
+  kalman_pat_rec->set_search_win_multiplier(1);
+  kalman_pat_rec->set_track_fitting_alg_name("DafSimple");
   kalman_pat_rec->set_do_evt_display(false);
 
 
@@ -459,15 +463,15 @@ void Svtx_Eval(std::string outputfile, int verbosity = 0)
   // SVTX evaluation
   //----------------
 
-  SvtxEvaluator* eval = new SvtxEvaluator("SVTXEVALUATOR", outputfile.c_str());
-  eval->do_cluster_eval(true);   // make cluster ntuple
-  eval->do_g4hit_eval(false);     // make g4hit ntuple
-  eval->do_hit_eval(false);         // make hit ntuple
-  eval->do_gpoint_eval(false);
-  //eval->scan_for_embedded(true);  // evaluator will only collect embedded tracks - it will also ignore decay tracks from embedded particles!
-  eval->scan_for_embedded(false); // evaluator takes all tracks
-  eval->Verbosity(verbosity);
-  se->registerSubsystem( eval );
+//  SvtxEvaluator* eval = new SvtxEvaluator("SVTXEVALUATOR", outputfile.c_str());
+//  eval->do_cluster_eval(true);   // make cluster ntuple
+//  eval->do_g4hit_eval(false);     // make g4hit ntuple
+//  eval->do_hit_eval(false);         // make hit ntuple
+//  eval->do_gpoint_eval(false);
+//  //eval->scan_for_embedded(true);  // evaluator will only collect embedded tracks - it will also ignore decay tracks from embedded particles!
+//  eval->scan_for_embedded(false); // evaluator takes all tracks
+//  eval->Verbosity(verbosity);
+//  se->registerSubsystem( eval );
 
   // MomentumEvaluator* eval = new MomentumEvaluator(outputfile.c_str(),0.2,0.4,Max_si_layer,2,Max_si_layer-4,10.,80.);
   // se->registerSubsystem( eval );
