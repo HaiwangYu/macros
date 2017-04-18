@@ -369,6 +369,14 @@ void Svtx_Reco(int verbosity = 0)
   tpcclusterizer->Verbosity(verbosity);
   se->registerSubsystem( tpcclusterizer );
 
+//  PHG4TPCClusterizer* tpcclusterizer = new PHG4TPCClusterizer();
+//  tpcclusterizer->Verbosity(0);
+//  tpcclusterizer->setEnergyCut(15/*adc*/);
+//  tpcclusterizer->setRangeLayers(n_maps_layer+n_intt_layer,Max_si_layer);
+//  tpcclusterizer->setFitWindowSigmas(0.0120,0.0120);
+//  tpcclusterizer->setFitWindowMax(4/*rphibins*/,3/*zbins*/);
+//  tpcclusterizer->setFitEnergyThreshold( 0.05 /*fraction*/ );
+//  se->registerSubsystem( tpcclusterizer );
 
   //---------------------
   // PHG4KalmanPatRec
@@ -385,7 +393,7 @@ void Svtx_Reco(int verbosity = 0)
   kalman_pat_rec->set_seeding_layer(seeding_layer, seeding_nlayer);
 
   kalman_pat_rec->set_mag_field(1.4);
-  kalman_pat_rec->Verbosity(100);
+  kalman_pat_rec->Verbosity(10);
   // ALICE ITS upgrade values for total thickness in X_0
   kalman_pat_rec->set_material(0, 0.003);
   kalman_pat_rec->set_material(1, 0.003);
@@ -406,6 +414,12 @@ void Svtx_Reco(int verbosity = 0)
 
 
   kalman_pat_rec->set_seeding_only_mode(false);
+
+  kalman_pat_rec->set_max_merging_dphi(0.002);
+  kalman_pat_rec->set_max_merging_deta(0.001);
+  kalman_pat_rec->set_max_merging_dr(0.005);
+  kalman_pat_rec->set_max_merging_dz(0.005);
+
   kalman_pat_rec->set_search_win_multiplier(3.);
   kalman_pat_rec->set_track_fitting_alg_name("DafSimple");
   kalman_pat_rec->set_do_evt_display(false);
