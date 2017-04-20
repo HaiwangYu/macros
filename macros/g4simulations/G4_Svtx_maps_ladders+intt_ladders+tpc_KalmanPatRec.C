@@ -414,15 +414,15 @@ void Svtx_Reco(int verbosity = 0)
 
 
   kalman_pat_rec->set_seeding_only_mode(false);
+  kalman_pat_rec->set_do_evt_display(false);
 
   kalman_pat_rec->set_max_merging_dphi(0.002);
   kalman_pat_rec->set_max_merging_deta(0.001);
   kalman_pat_rec->set_max_merging_dr(0.005);
   kalman_pat_rec->set_max_merging_dz(0.005);
 
-  kalman_pat_rec->set_search_win_multiplier(3.);
+  kalman_pat_rec->set_search_win_multiplier(5.);
   kalman_pat_rec->set_track_fitting_alg_name("DafSimple");
-  kalman_pat_rec->set_do_evt_display(false);
 
 
   se->registerSubsystem( kalman_pat_rec );
