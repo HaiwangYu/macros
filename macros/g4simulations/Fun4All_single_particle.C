@@ -71,10 +71,10 @@ int Fun4All_single_particle (
 	bool do_hcalout_cluster = do_hcalout_twr && true;
 	bool do_hcalout_eval = do_hcalout_cluster && true;
 
-	bool do_global = true;
+	bool do_global = false;
 	bool do_global_fastsim = false;
 
-	bool do_jet_reco = true;
+	bool do_jet_reco = false;
 	bool do_jet_eval = false;
 
 	bool do_dst_compress = false;
@@ -180,8 +180,8 @@ int Fun4All_single_particle (
 		PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
 		// mu+,e+,proton,pi+,Upsilon
 		gen->add_particles("pi+",1);
-//		gen->add_particles("pi+",500);
-//		gen->add_particles("pi-",500);
+//		gen->add_particles("mu+",180);
+//		gen->add_particles("mu-",180);
 		if (readhepmc || do_embedding)
 		{
 			gen->set_reuse_existing_vertex(true);
@@ -197,11 +197,11 @@ int Fun4All_single_particle (
 		}
 		gen->set_vertex_size_function(PHG4SimpleEventGenerator::Uniform);
 		gen->set_vertex_size_parameters(0.0, 0.0);
-		gen->set_eta_range(-1., 1.);
-		gen->set_phi_range(-1.0 * TMath::Pi(), 1.0 * TMath::Pi());
+		gen->set_eta_range(-1, 1);
+		gen->set_phi_range(-1 * TMath::Pi(), 1 * TMath::Pi());
 //		gen->set_eta_range(0, 0);
 //		gen->set_phi_range(0, 0);
-		gen->set_pt_range(30, 30);
+		gen->set_pt_range(1, 30);
 		gen->Embed(10);
 		gen->Verbosity(0);
 		if (! usegun)
@@ -405,9 +405,9 @@ int Fun4All_single_particle (
 				);
 	}
 
-	Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", outputFile);
-	if (do_dst_compress) DstCompress(out);
-	se->registerOutputManager(out);
+//	Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", outputFile);
+//	if (do_dst_compress) DstCompress(out);
+//	se->registerOutputManager(out);
 
 	//-----------------
 	// Event processing

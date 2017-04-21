@@ -183,7 +183,7 @@ blackhole->set_double_param("radius",radius + 10); // add 10 cm
   blackhole->set_double_param("thickness",radius - no_overlapp); // it needs some thickness
   blackhole->SetActive(); // always see what leaks out
   blackhole->OverlapCheck(overlapcheck);
-  g4Reco->registerSubsystem(blackhole);
+  //g4Reco->registerSubsystem(blackhole);
 
   blackhole = new PHG4CylinderSubsystem("BH_FORWARD_NEG", 1);
   blackhole->SuperDetector("BH_FORWARD_NEG");
@@ -195,7 +195,7 @@ blackhole->set_double_param("radius",radius + 10); // add 10 cm
   blackhole->set_double_param("thickness",radius - no_overlapp); // it needs some thickness
   blackhole->SetActive(); // always see what leaks out
   blackhole->OverlapCheck(overlapcheck);
-  g4Reco->registerSubsystem(blackhole);
+  //g4Reco->registerSubsystem(blackhole);
 
   PHG4TruthSubsystem *truth = new PHG4TruthSubsystem();
   g4Reco->registerSubsystem(truth);
