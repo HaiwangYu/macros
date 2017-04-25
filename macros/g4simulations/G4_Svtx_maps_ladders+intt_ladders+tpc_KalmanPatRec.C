@@ -1,5 +1,7 @@
 #include <vector>
 
+//#define _USE_NEW_TPC_
+
 const int n_maps_layer = 3;
 const int n_intt_layer = 4;   // must be 0-4, setting this to zero will remove the INTT completely, n < 4 gives you the first n layers
 const int n_gas_layer = 60;
@@ -231,11 +233,25 @@ void Svtx_Cells(int verbosity = 0)
     //  tpc_distortion -> setPrecision(1); // option to over write default  factors
   }
 
+#ifdef _USE_NEW_TPC_
+  PHG4CylinderCellTPCReco *svtx_cells = new PHG4CylinderCellTPCReco(n_maps_layer+n_intt_layer);
+  svtx_cells->Detector("SVTX");
+  svtx_cells->setDistortion(tpc_distortion);
+  svtx_cells->setDiffusionT(0.0120);
+  svtx_cells->setDiffusionL(0.0120);
+  svtx_cells->set_drift_velocity(6.0/1000.0l);
+  svtx_cells->setHalfLength( 105.5 );
+  svtx_cells->setElectronsPerKeV(28);
+  svtx_cells->Verbosity(0);
+#else
   PHG4CylinderCellTPCReco *svtx_cells = new PHG4CylinderCellTPCReco(n_maps_layer+n_intt_layer);
   svtx_cells->setDistortion(tpc_distortion); // apply TPC distrotion if tpc_distortion is not NULL
   svtx_cells->setDiffusion(diffusion);
   svtx_cells->setElectronsPerKeV(electrons_per_kev);
   svtx_cells->Detector("SVTX");
+#endif
+
+
 
   // The INTT ladder cell size is set in the detector construction code
 
@@ -364,23 +380,33 @@ void Svtx_Reco(int verbosity = 0)
 
   se->registerSubsystem( clusterizer );
 
+#ifdef _USE_NEW_TPC_
+  PHG4TPCClusterizer* tpcclusterizer = new PHG4TPCClusterizer();
+  tpcclusterizer->Verbosity(0);
+  tpcclusterizer->setEnergyCut(15/*adc*/);
+  tpcclusterizer->setRangeLayers(n_maps_layer+n_intt_layer,Max_si_layer);
+  tpcclusterizer->setFitWindowSigmas(0.0120,0.0120);
+  tpcclusterizer->setFitWindowMax(4/*rphibins*/,3/*zbins*/);
+  tpcclusterizer->setFitEnergyThreshold( 0.05 /*fraction*/ );
+  se->registerSubsystem( tpcclusterizer );
+#else
   PHG4TPCClusterizer* tpcclusterizer = new PHG4TPCClusterizer("PHG4TPCClusterizer",3,4,n_maps_layer+n_intt_layer,Max_si_layer-1);
   tpcclusterizer->setEnergyCut(20.0*45.0/n_gas_layer);
   tpcclusterizer->Verbosity(verbosity);
   se->registerSubsystem( tpcclusterizer );
+#endif
 
-//  PHG4TPCClusterizer* tpcclusterizer = new PHG4TPCClusterizer();
-//  tpcclusterizer->Verbosity(0);
-//  tpcclusterizer->setEnergyCut(15/*adc*/);
-//  tpcclusterizer->setRangeLayers(n_maps_layer+n_intt_layer,Max_si_layer);
-//  tpcclusterizer->setFitWindowSigmas(0.0120,0.0120);
-//  tpcclusterizer->setFitWindowMax(4/*rphibins*/,3/*zbins*/);
-//  tpcclusterizer->setFitEnergyThreshold( 0.05 /*fraction*/ );
-//  se->registerSubsystem( tpcclusterizer );
 
+#define _USE_KALMAN_PAT_REC_
+
+#ifdef _USE_KALMAN_PAT_REC_
   //---------------------
   // PHG4KalmanPatRec
   //---------------------
+//  const int seeding_nlayer = 10;
+//  const int min_seeding_nlayer = 10;
+//  int seeding_layer[] = {0, 1, 2, 3, 4, 5, 6, 7, 30, 60};
+
   const int seeding_nlayer = 8;
   const int min_seeding_nlayer = 8;
   int seeding_layer[] = {0, 1, 2, 3, 4, 5, 6, 7};
@@ -412,36 +438,39 @@ void Svtx_Reco(int verbosity = 0)
   kalman_pat_rec->setRemoveHits(false);
   kalman_pat_rec->setCutOnDCA(true);
 
-
   kalman_pat_rec->set_seeding_only_mode(false);
-  kalman_pat_rec->set_do_evt_display(false);
+  kalman_pat_rec->set_do_evt_display(true);
 
   kalman_pat_rec->set_max_merging_dphi(0.002);
   kalman_pat_rec->set_max_merging_deta(0.001);
   kalman_pat_rec->set_max_merging_dr(0.005);
   kalman_pat_rec->set_max_merging_dz(0.005);
 
-  kalman_pat_rec->set_search_win_multiplier(5.);
-  kalman_pat_rec->set_track_fitting_alg_name("DafSimple");
+  kalman_pat_rec->set_search_win_rphi(30.);
+  kalman_pat_rec->set_search_win_z(3.);
 
+  //KalmanFitter, KalmanFitterRefTrack, DafSimple, DafRef
+  kalman_pat_rec->set_track_fitting_alg_name("DafSimple");
 
   se->registerSubsystem( kalman_pat_rec );
 
+#else
   //---------------------
   // Truth Pattern Recognition
   //---------------------
-//  PHG4TruthPatRec* pat_rec = new PHG4TruthPatRec();
-//  se->registerSubsystem(pat_rec);
+  PHG4TruthPatRec* pat_rec = new PHG4TruthPatRec();
+  se->registerSubsystem(pat_rec);
   
   //---------------------
   // Kalman Filter
   //---------------------
-//  PHG4TrackKalmanFitter* kalman = new PHG4TrackKalmanFitter();
-//  kalman->set_output_mode(PHG4TrackKalmanFitter::OverwriteOriginalNode);//MakeNewNode, OverwriteOriginalNode, DebugMode
-//  kalman->set_do_eval(true);
-//  kalman->set_eval_filename("PHG4TrackKalmanFitter_eval.root");
-//  se->registerSubsystem(kalman);
+  PHG4TrackKalmanFitter* kalman = new PHG4TrackKalmanFitter();
+  kalman->set_output_mode(PHG4TrackKalmanFitter::OverwriteOriginalNode);//MakeNewNode, OverwriteOriginalNode, DebugMode
+  kalman->set_do_eval(true);
+  kalman->set_eval_filename("PHG4TrackKalmanFitter_eval.root");
+  se->registerSubsystem(kalman);
   
+#endif
   //------------------
   // Track Projections
   //------------------
