@@ -359,9 +359,16 @@ void Svtx_Reco(int verbosity = 0)
 //
 //  hough->Verbosity(verbosity);
 
+#define _USE_KALMAN_PAT_REC_
+
+#ifdef _USE_KALMAN_PAT_REC_
   //---------------------
   // PHG4KalmanPatRec
   //---------------------
+//  const int seeding_nlayer = 10;
+//  const int min_seeding_nlayer = 10;
+//  int seeding_layer[] = {0, 1, 2, 3, 4, 5, 6, 7, 30, 60};
+
   const int seeding_nlayer = 8;
   const int min_seeding_nlayer = 8;
   int seeding_layer[] = {0, 1, 2, 3, 4, 5, 6, 7};
@@ -374,7 +381,7 @@ void Svtx_Reco(int verbosity = 0)
   kalman_pat_rec->set_seeding_layer(seeding_layer, seeding_nlayer);
 
   kalman_pat_rec->set_mag_field(1.4);
-  kalman_pat_rec->Verbosity(100);
+  kalman_pat_rec->Verbosity(10);
   // ALICE ITS upgrade values for total thickness in X_0
   kalman_pat_rec->set_material(0, 0.003);
   kalman_pat_rec->set_material(1, 0.003);
@@ -393,30 +400,39 @@ void Svtx_Reco(int verbosity = 0)
   kalman_pat_rec->setRemoveHits(false);
   kalman_pat_rec->setCutOnDCA(true);
 
-
   kalman_pat_rec->set_seeding_only_mode(false);
-  kalman_pat_rec->set_search_win_multiplier(3.);
-  kalman_pat_rec->set_track_fitting_alg_name("DafSimple");
-  kalman_pat_rec->set_do_evt_display(false);
+  kalman_pat_rec->set_do_evt_display(true);
 
+  kalman_pat_rec->set_max_merging_dphi(0.002);
+  kalman_pat_rec->set_max_merging_deta(0.001);
+  kalman_pat_rec->set_max_merging_dr(0.005);
+  kalman_pat_rec->set_max_merging_dz(0.005);
+
+  kalman_pat_rec->set_search_win_rphi(5.);
+  kalman_pat_rec->set_search_win_z(5.);
+
+  //KalmanFitter, KalmanFitterRefTrack, DafSimple, DafRef
+  kalman_pat_rec->set_track_fitting_alg_name("DafSimple");
 
   se->registerSubsystem( kalman_pat_rec );
 
+#else
   //---------------------
   // Truth Pattern Recognition
   //---------------------
-//  PHG4TruthPatRec* pat_rec = new PHG4TruthPatRec();
-//  se->registerSubsystem(pat_rec);
+  PHG4TruthPatRec* pat_rec = new PHG4TruthPatRec();
+  se->registerSubsystem(pat_rec);
   
   //---------------------
   // Kalman Filter
   //---------------------
-//  PHG4TrackKalmanFitter* kalman = new PHG4TrackKalmanFitter();
-//  kalman->set_output_mode(PHG4TrackKalmanFitter::MakeNewNode);//MakeNewNode, OverwriteOriginalNode, DebugMode
-//  kalman->set_do_eval(true);
-//  kalman->set_eval_filename("PHG4TrackKalmanFitter_eval.root");
-//  kalman->set_do_evt_display(true);
-//  se->registerSubsystem(kalman);
+  PHG4TrackKalmanFitter* kalman = new PHG4TrackKalmanFitter();
+  kalman->set_output_mode(PHG4TrackKalmanFitter::OverwriteOriginalNode);//MakeNewNode, OverwriteOriginalNode, DebugMode
+  kalman->set_do_eval(true);
+  kalman->set_eval_filename("PHG4TrackKalmanFitter_eval.root");
+  se->registerSubsystem(kalman);
+
+#endif
     
   //------------------
   // Track Projections
