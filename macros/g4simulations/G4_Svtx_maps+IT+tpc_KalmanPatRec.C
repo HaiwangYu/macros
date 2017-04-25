@@ -408,7 +408,7 @@ void Svtx_Reco(int verbosity = 0)
   kalman_pat_rec->set_max_merging_dr(0.005);
   kalman_pat_rec->set_max_merging_dz(0.005);
 
-  kalman_pat_rec->set_search_win_rphi(5.);
+  kalman_pat_rec->set_search_win_rphi(30.);
   kalman_pat_rec->set_search_win_z(5.);
 
   //KalmanFitter, KalmanFitterRefTrack, DafSimple, DafRef
