@@ -1,7 +1,7 @@
 int Fun4All_single_particle (
 		const int nEvents = 2,
 		const char * inputFile = NULL,
-		const char * outputFile = "SvtxTracks.root",
+		const char * outputFile = "SvtxClusters.root",
 		const char * embed_input_file = "Hijing_G4Hits.root",
 		const int which_tracking = 1,
 		const bool do_embedding = false
@@ -46,8 +46,9 @@ int Fun4All_single_particle (
 
 	bool do_svtx = true;
 	bool do_svtx_cell = do_svtx && true;
-	bool do_svtx_track = do_svtx_cell && true;
-	bool do_svtx_eval = do_svtx_track && true;
+	bool do_svtx_cluster = do_svtx_cell && true;
+	bool do_svtx_track = do_svtx_cluster && false;
+	bool do_svtx_eval = do_svtx_track && false;
 
 	bool do_preshower = false;
 
@@ -179,9 +180,9 @@ int Fun4All_single_particle (
 		// toss low multiplicity dummy events
 		PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
 		// mu+,e+,proton,pi+,Upsilon
-		gen->add_particles("mu+",1);
-//		gen->add_particles("mu+",180);
-//		gen->add_particles("mu-",180);
+//		gen->add_particles("pi+",4);
+		gen->add_particles("pi+",50);
+		gen->add_particles("pi-",50);
 		if (readhepmc || do_embedding)
 		{
 			gen->set_reuse_existing_vertex(true);
@@ -201,7 +202,7 @@ int Fun4All_single_particle (
 		gen->set_phi_range(-1 * TMath::Pi(), 1 * TMath::Pi());
 //		gen->set_eta_range(0, 0);
 //		gen->set_phi_range(0, 0);
-		gen->set_pt_range(2,2);
+		gen->set_pt_range(0.5, 5);
 		gen->Embed(10);
 		gen->Verbosity(0);
 		if (! usegun)
@@ -291,6 +292,8 @@ int Fun4All_single_particle (
 	//--------------
 	// SVTX tracking
 	//--------------
+
+	if (do_svtx_cluster) Svtx_Cluster();
 
 	if (do_svtx_track) Svtx_Reco();
 
@@ -405,9 +408,9 @@ int Fun4All_single_particle (
 				);
 	}
 
-//	Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", outputFile);
-//	if (do_dst_compress) DstCompress(out);
-//	se->registerOutputManager(out);
+	Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", outputFile);
+	if (do_dst_compress) DstCompress(out);
+	se->registerOutputManager(out);
 
 	//-----------------
 	// Event processing

@@ -266,7 +266,7 @@ void Svtx_Cells(int verbosity = 0)
   return;
 }
 
-void Svtx_Reco(int verbosity = 0)
+void Svtx_Cluster(int verbosity = 0)
 {
   //---------------
   // Load libraries
@@ -395,7 +395,22 @@ void Svtx_Reco(int verbosity = 0)
   tpcclusterizer->Verbosity(verbosity);
   se->registerSubsystem( tpcclusterizer );
 #endif
+}
 
+void Svtx_Reco(int verbosity = 0)
+{
+  //---------------
+  // Load libraries
+  //---------------
+
+  gSystem->Load("libfun4all.so");
+  gSystem->Load("libg4hough.so");
+
+  //---------------
+  // Fun4All server
+  //---------------
+
+  Fun4AllServer *se = Fun4AllServer::instance();
 
 #define _USE_KALMAN_PAT_REC_
 
@@ -460,17 +475,18 @@ void Svtx_Reco(int verbosity = 0)
   //---------------------
   PHG4TruthPatRec* pat_rec = new PHG4TruthPatRec();
   se->registerSubsystem(pat_rec);
+#endif
   
   //---------------------
   // Kalman Filter
   //---------------------
   PHG4TrackKalmanFitter* kalman = new PHG4TrackKalmanFitter();
-  kalman->set_output_mode(PHG4TrackKalmanFitter::OverwriteOriginalNode);//MakeNewNode, OverwriteOriginalNode, DebugMode
-  kalman->set_do_eval(true);
+  kalman->set_over_write_svtxtrackmap(true);
+  kalman->set_over_write_svtxvertexmap(true);
+  kalman->set_do_eval(false);
   kalman->set_eval_filename("PHG4TrackKalmanFitter_eval.root");
   se->registerSubsystem(kalman);
   
-#endif
   //------------------
   // Track Projections
   //------------------

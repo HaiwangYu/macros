@@ -272,7 +272,7 @@ void Svtx_Cells(int verbosity = 0)
   return;
 }
 
-void Svtx_Reco(int verbosity = 0)
+void Svtx_Cluster(int verbosity = 0)
 {
   //---------------
   // Load libraries
@@ -299,12 +299,12 @@ void Svtx_Reco(int verbosity = 0)
     digi->set_adc_scale(i, 10000, 1.0);
   }
   se->registerSubsystem( digi );
-  
+
   //-------------------------------------
   // Apply Live Area Inefficiency to Hits
   //-------------------------------------
   // defaults to 1.0 (fully active)
-  
+
   PHG4SvtxDeadArea* deadarea = new PHG4SvtxDeadArea();
   deadarea->Verbosity(verbosity);
   for(int i=0;i<n_ib_layer;i++)
@@ -325,7 +325,7 @@ void Svtx_Reco(int verbosity = 0)
     thresholds->set_threshold(i,0.25);  // reduce to 0.1 for increased efficiency
 
   for(int i=n_ib_layer;i<n_ib_layer+n_intt_layer;i++)
-    thresholds->set_threshold(i,0.25);  
+    thresholds->set_threshold(i,0.25);
 
   se->registerSubsystem( thresholds );
 
@@ -336,10 +336,26 @@ void Svtx_Reco(int verbosity = 0)
   PHG4SvtxClusterizer* clusterizer = new PHG4SvtxClusterizer("PHG4SvtxClusterizer",Min_si_layer,n_ib_layer+n_intt_layer-1);
   clusterizer->set_threshold(0.25);  // reduced from 0.5, should be same as cell threshold, since many hits are single cell
   se->registerSubsystem( clusterizer );
-  
+
   PHG4TPCClusterizer* tpcclusterizer = new PHG4TPCClusterizer("PHG4TPCClusterizer",3,4,n_ib_layer+n_intt_layer,Max_si_layer);
   tpcclusterizer->setEnergyCut(20.0*45.0/n_gas_layer);
   se->registerSubsystem( tpcclusterizer );
+}
+
+void Svtx_Reco(int verbosity = 0)
+{
+  //---------------
+  // Load libraries
+  //---------------
+
+  gSystem->Load("libfun4all.so");
+  gSystem->Load("libg4hough.so");
+
+  //---------------
+  // Fun4All server
+  //---------------
+
+  Fun4AllServer *se = Fun4AllServer::instance();
   
   //---------------------
   // PHG4HoughTransformTPC
@@ -422,18 +438,18 @@ void Svtx_Reco(int verbosity = 0)
   //---------------------
   PHG4TruthPatRec* pat_rec = new PHG4TruthPatRec();
   se->registerSubsystem(pat_rec);
+#endif
   
   //---------------------
   // Kalman Filter
   //---------------------
   PHG4TrackKalmanFitter* kalman = new PHG4TrackKalmanFitter();
-  kalman->set_output_mode(PHG4TrackKalmanFitter::OverwriteOriginalNode);//MakeNewNode, OverwriteOriginalNode, DebugMode
-  kalman->set_do_eval(true);
+  kalman->set_over_write_svtxtrackmap(true);
+  kalman->set_over_write_svtxvertexmap(true);
+  kalman->set_do_eval(false);
   kalman->set_eval_filename("PHG4TrackKalmanFitter_eval.root");
   se->registerSubsystem(kalman);
 
-#endif
-    
   //------------------
   // Track Projections
   //------------------

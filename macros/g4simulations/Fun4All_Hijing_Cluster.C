@@ -1,4 +1,4 @@
-int Fun4All_Hijing(
+int Fun4All_Hijing_Cluster(
 		const int nEvents = 1,
 		const char * inputFile = "/sphenix/user/belmonrj/HIJING_a/hijing_00005.txt.bz2",
 		const char * outputFile = "Hijing_G4Hits.root",
@@ -45,8 +45,9 @@ int Fun4All_Hijing(
 
 	bool do_svtx = true;
 	bool do_svtx_cell = do_svtx && true;
-	bool do_svtx_track = do_svtx_cell && true;
-	bool do_svtx_eval = do_svtx_track && true;
+	bool do_svtx_cluster = do_svtx_cell && true;
+	bool do_svtx_track = do_svtx_cluster && false;
+	bool do_svtx_eval = do_svtx_track && false;
 
 	bool do_preshower = false;
 
@@ -106,7 +107,7 @@ int Fun4All_Hijing(
 	//---------------
 
 	Fun4AllServer *se = Fun4AllServer::instance();
-	se->Verbosity(10);
+	se->Verbosity(0);
 	// just if we set some flags somewhere in this macro
 	recoConsts *rc = recoConsts::instance();
 	// By default every random number generator uses
@@ -278,6 +279,8 @@ int Fun4All_Hijing(
 	//--------------
 	// SVTX tracking
 	//--------------
+
+	if (do_svtx_cluster) Svtx_Cluster();
 
 	if (do_svtx_track) Svtx_Reco();
 
