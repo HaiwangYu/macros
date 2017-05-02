@@ -1,7 +1,7 @@
 int Fun4All_Hijing_Cluster(
 		const int nEvents = 1,
 		const char * inputFile = "/sphenix/user/belmonrj/HIJING_a/hijing_00005.txt.bz2",
-		const char * outputFile = "Hijing_G4Hits.root",
+		const char * outputFile = "SvtxClusters.root",
 		const char * embed_input_file = NULL,
 		const int which_tracking = 0
 		)
@@ -25,6 +25,8 @@ int Fun4All_Hijing_Cluster(
 	// Use pythia
 	const bool runpythia8 = false;
 	const bool runpythia6 = false;
+
+	const bool runsimpgen = true;
 	// else
 	// Use particle generator (default simple generator)
 	// or gun/ very simple generator
@@ -166,12 +168,13 @@ int Fun4All_Hijing_Cluster(
 		HepMCNodeReader *hr = new HepMCNodeReader();
 		se->registerSubsystem(hr);
 	}
-	else
+
+	if(runsimpgen || !(readhits || readhepmc || runpythia8 || runpythia6) )
 	{
 		// toss low multiplicity dummy events
 		PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
-		gen->add_particles("e-",1); // mu+,e+,proton,pi+,Upsilon
-		// gen->add_particles("e+",5); // mu-,e-,anti_proton,pi-
+		gen->add_particles("pi+",50); // mu+,e+,proton,pi+,Upsilon
+		gen->add_particles("pi-",50); // mu-,e-,anti_proton,pi-
 		if (readhepmc || do_embedding)
 		{
 			gen->set_reuse_existing_vertex(true);
@@ -183,14 +186,14 @@ int Fun4All_Hijing_Cluster(
 					PHG4SimpleEventGenerator::Uniform,
 					PHG4SimpleEventGenerator::Uniform);
 			gen->set_vertex_distribution_mean(0.0, 0.0, 0.0);
-			gen->set_vertex_distribution_width(0.0, 0.0, 5.0);
+			gen->set_vertex_distribution_width(0.0, 0.0, 0.0);
 		}
 		gen->set_vertex_size_function(PHG4SimpleEventGenerator::Uniform);
 		gen->set_vertex_size_parameters(0.0, 0.0);
 		gen->set_eta_range(-0.5, 0.5);
 		gen->set_phi_range(-1.0 * TMath::Pi(), 1.0 * TMath::Pi());
-		gen->set_pt_range(0.1, 10.0);
-		gen->Embed(1);
+		gen->set_pt_range(30,30);
+		gen->Embed(10);
 		gen->Verbosity(0);
 		if (! usegun)
 		{

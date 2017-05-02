@@ -63,13 +63,24 @@ void RunKalmanPatRec(
 	kalman_pat_rec->set_seeding_only_mode(false);
 	kalman_pat_rec->set_do_evt_display(false);
 
+	//loose
+//	kalman_pat_rec->set_search_win_rphi(100.);
+//	kalman_pat_rec->set_search_win_z(5.);
+//	kalman_pat_rec->set_max_incr_chi2(100.);
+//	kalman_pat_rec->set_max_consecutive_missing_layer(60);
+
+	//realistic for ana.49
+	kalman_pat_rec->set_search_win_rphi(5.);
+	kalman_pat_rec->set_search_win_z(5.);
+	kalman_pat_rec->set_max_incr_chi2(10.);
+	kalman_pat_rec->set_max_consecutive_missing_layer(10);
+
+	kalman_pat_rec->set_min_good_track_hits(30);
+
 	kalman_pat_rec->set_max_merging_dphi(0.0020);
 	kalman_pat_rec->set_max_merging_deta(0.0010);
 	kalman_pat_rec->set_max_merging_dr(  0.0050);
 	kalman_pat_rec->set_max_merging_dz(  0.0050);
-
-	kalman_pat_rec->set_search_win_rphi(30.);
-	kalman_pat_rec->set_search_win_z(5.);
 
 	//KalmanFitter, KalmanFitterRefTrack, DafSimple, DafRef
 	kalman_pat_rec->set_track_fitting_alg_name("DafSimple");
@@ -121,7 +132,7 @@ void RunKalmanPatRec(
 	eval->do_g4hit_eval(true);
 	eval->do_hit_eval(false);
 	eval->do_gpoint_eval(false);
-	eval->scan_for_embedded(false); // take all tracks if false - take only embedded tracks if true (will not record decay particles!! - loses Upsilon electrons)
+	eval->scan_for_embedded(true); // take all tracks if false - take only embedded tracks if true (will not record decay particles!! - loses Upsilon electrons)
 	eval->Verbosity(0);
 	se->registerSubsystem(eval);
 

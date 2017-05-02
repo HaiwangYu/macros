@@ -1,3 +1,4 @@
+//#define _USE_NEW_TPC_
 
 const int n_ib_layer = 3;   // number of maps inner barrel layers
 const int n_intt_layer = 4; // number of int. tracker layers. Make this number 0 to use MAPS + TPC only.
@@ -249,11 +250,30 @@ void Svtx_Cells(int verbosity = 0)
     //  tpc_distortion -> setPrecision(1); // option to over write default
     //  factors
   }
+
+#ifdef _USE_NEW_TPC_
+  PHG4CylinderCellTPCReco *svtx_cells = new PHG4CylinderCellTPCReco(n_ib_layer+n_intt_layer);
+  svtx_cells->Detector("SVTX");
+  svtx_cells->setDistortion(tpc_distortion);
+  svtx_cells->setDiffusionT(0.0120);
+  svtx_cells->setDiffusionL(0.0120);
+  svtx_cells->set_drift_velocity(6.0/1000.0l);
+  svtx_cells->setHalfLength( 105.5 );
+  svtx_cells->setElectronsPerKeV(28);
+  svtx_cells->Verbosity(0);
+#else
   PHG4CylinderCellTPCReco *svtx_cells = new PHG4CylinderCellTPCReco(n_ib_layer+n_intt_layer);
   svtx_cells->setDistortion(tpc_distortion); // apply TPC distrotion if tpc_distortion is not NULL
   svtx_cells->setDiffusion(diffusion);
   svtx_cells->setElectronsPerKeV(electrons_per_kev);
   svtx_cells->Detector("SVTX");
+#endif
+
+//  PHG4CylinderCellTPCReco *svtx_cells = new PHG4CylinderCellTPCReco(n_ib_layer+n_intt_layer);
+//  svtx_cells->setDistortion(tpc_distortion); // apply TPC distrotion if tpc_distortion is not NULL
+//  svtx_cells->setDiffusion(diffusion);
+//  svtx_cells->setElectronsPerKeV(electrons_per_kev);
+//  svtx_cells->Detector("SVTX");
 
   for (int i=0;i<n_ib_layer;++i) {
     svtx_cells->cellsize(i, svxcellsizex[i], svxcellsizey[i]);
@@ -337,9 +357,25 @@ void Svtx_Cluster(int verbosity = 0)
   clusterizer->set_threshold(0.25);  // reduced from 0.5, should be same as cell threshold, since many hits are single cell
   se->registerSubsystem( clusterizer );
 
-  PHG4TPCClusterizer* tpcclusterizer = new PHG4TPCClusterizer("PHG4TPCClusterizer",3,4,n_ib_layer+n_intt_layer,Max_si_layer);
-  tpcclusterizer->setEnergyCut(20.0*45.0/n_gas_layer);
+#ifdef _USE_NEW_TPC_
+  PHG4TPCClusterizer* tpcclusterizer = new PHG4TPCClusterizer();
+  tpcclusterizer->Verbosity(0);
+  tpcclusterizer->setEnergyCut(15/*adc*/);
+  tpcclusterizer->setRangeLayers(n_ib_layer+n_intt_layer,Max_si_layer);
+  tpcclusterizer->setFitWindowSigmas(0.0120,0.0120);
+  tpcclusterizer->setFitWindowMax(4/*rphibins*/,3/*zbins*/);
+  tpcclusterizer->setFitEnergyThreshold( 0.05 /*fraction*/ );
   se->registerSubsystem( tpcclusterizer );
+#else
+  PHG4TPCClusterizer* tpcclusterizer = new PHG4TPCClusterizer("PHG4TPCClusterizer",3,4,n_ib_layer+n_intt_layer,Max_si_layer-1);
+  tpcclusterizer->setEnergyCut(20.0*45.0/n_gas_layer);
+  tpcclusterizer->Verbosity(verbosity);
+  se->registerSubsystem( tpcclusterizer );
+#endif
+
+//  PHG4TPCClusterizer* tpcclusterizer = new PHG4TPCClusterizer("PHG4TPCClusterizer",3,4,n_ib_layer+n_intt_layer,Max_si_layer);
+//  tpcclusterizer->setEnergyCut(20.0*45.0/n_gas_layer);
+//  se->registerSubsystem( tpcclusterizer );
 }
 
 void Svtx_Reco(int verbosity = 0)
