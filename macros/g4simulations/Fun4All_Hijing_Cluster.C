@@ -3,7 +3,7 @@ int Fun4All_Hijing_Cluster(
 		const char * inputFile = "/sphenix/user/belmonrj/HIJING_a/hijing_00005.txt.bz2",
 		const char * outputFile = "SvtxClusters.root",
 		const char * embed_input_file = NULL,
-		const int which_tracking = 0
+		const int which_tracking = 14
 		)
 {
 	//===============

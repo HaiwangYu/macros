@@ -1,9 +1,11 @@
+//#define _SEPARATE_CLUSTER_TRACKING_
+
 int Fun4All_single_particle (
 		const int nEvents = 2,
 		const char * inputFile = NULL,
 		const char * outputFile = "SvtxClusters.root",
 		const char * embed_input_file = "Hijing_G4Hits.root",
-		const int which_tracking = 1,
+		const int which_tracking = 14,
 		const bool do_embedding = false
 		)
 {
@@ -45,10 +47,10 @@ int Fun4All_single_particle (
 	bool do_pipe = true;
 
 	bool do_svtx = true;
-	bool do_svtx_cell = do_svtx && true;
-	bool do_svtx_cluster = do_svtx_cell && true;
-	bool do_svtx_track = do_svtx_cluster && false;
-	bool do_svtx_eval = do_svtx_track && false;
+	bool do_svtx_cell = true;
+	bool do_svtx_cluster = true;
+	bool do_svtx_track = true;
+	bool do_svtx_eval = true;
 
 	bool do_preshower = false;
 
@@ -293,9 +295,13 @@ int Fun4All_single_particle (
 	// SVTX tracking
 	//--------------
 
+#ifdef _SEPARATE_CLUSTER_TRACKING_
 	if (do_svtx_cluster) Svtx_Cluster();
 
 	if (do_svtx_track) Svtx_Reco();
+#else
+	if (do_svtx_cluster || do_svtx_track) Svtx_Reco();
+#endif
 
 	//-----------------
 	// Global Vertexing
