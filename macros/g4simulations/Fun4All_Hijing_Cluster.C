@@ -46,10 +46,10 @@ int Fun4All_Hijing_Cluster(
 	bool do_pipe = true;
 
 	bool do_svtx = true;
-	bool do_svtx_cell = do_svtx && true;
-	bool do_svtx_cluster = do_svtx_cell && true;
-	bool do_svtx_track = do_svtx_cluster && false;
-	bool do_svtx_eval = do_svtx_track && false;
+	bool do_svtx_cell = true;
+	bool do_svtx_cluster = true;
+	bool do_svtx_track = false;
+	bool do_svtx_eval = false;
 
 	bool do_preshower = false;
 
@@ -192,7 +192,7 @@ int Fun4All_Hijing_Cluster(
 		gen->set_vertex_size_parameters(0.0, 0.0);
 		gen->set_eta_range(-0.5, 0.5);
 		gen->set_phi_range(-1.0 * TMath::Pi(), 1.0 * TMath::Pi());
-		gen->set_pt_range(30,30);
+		gen->set_pt_range(0.5, 30);
 		gen->Embed(10);
 		gen->Verbosity(0);
 		if (! usegun)
@@ -283,9 +283,12 @@ int Fun4All_Hijing_Cluster(
 	// SVTX tracking
 	//--------------
 
-	if (do_svtx_cluster) Svtx_Cluster();
-
-	if (do_svtx_track) Svtx_Reco();
+	if(which_tracking == 14 || which_tracking == 15) {
+		if (do_svtx_cluster) Svtx_Cluster();
+		if (do_svtx_track) Svtx_Reco();
+	} else {
+		if (do_svtx_cluster || do_svtx_track) Svtx_Reco();
+	}
 
 	//-----------------
 	// Global Vertexing

@@ -1,6 +1,6 @@
-//#include <vector>
+#include <vector>
 
-//#define _USE_NEW_TPC_
+#define _USE_NEW_TPC_
 
 const int n_maps_layer = 3;
 const int n_intt_layer = 4;   // must be 0-4, setting this to zero will remove the INTT completely, n < 4 gives you the first n layers
@@ -204,8 +204,8 @@ void Svtx_Cells(int verbosity = 0)
     }
 
   // TPC cells
-  double diffusion = 0.0057;
-  double electrons_per_kev = 38.;
+  double diffusion = 0.0057; //0.012: Ne(96%),CF4, etc mm/sqrt(cm) 0.0057: by Alan
+  double electrons_per_kev = 38.;//28.,  38.;
   
   // tpc_cell_x is the TPC pad size.  The actual hit resolution depends not only on this pad size but also on the diffusion in the gas and amplification step
   double tpc_cell_x = 0.12;
