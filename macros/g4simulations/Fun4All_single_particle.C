@@ -47,8 +47,8 @@ int Fun4All_single_particle (
 	bool do_svtx = true;
 	bool do_svtx_cell = true;
 	bool do_svtx_cluster = true;
-	bool do_svtx_track = false;
-	bool do_svtx_eval = false;
+	bool do_svtx_track = true;
+	bool do_svtx_eval = true;
 
 	bool do_preshower = false;
 
