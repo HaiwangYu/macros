@@ -37,6 +37,7 @@ void G4Init(bool do_svtx = true,
       if(which_tracking == 13) gROOT->LoadMacro("G4_Svtx_maps+IT+tpc_ladder_material_TruthPatRec.C");
       if(which_tracking == 14) gROOT->LoadMacro("G4_Svtx_maps+IT+tpc_KalmanPatRec.C");
       if(which_tracking == 15) gROOT->LoadMacro("G4_Svtx_maps_ladders+intt_ladders+tpc_KalmanPatRec.C");
+      if(which_tracking == 16) gROOT->LoadMacro("G4_Svtx_maps_ladders+intt_ladders+tpc_KalmanPatRec_comb.C");
       SvtxInit();
     }
 
