@@ -1,5 +1,7 @@
 #include <vector>
 
+#define _USE_NEW_TPC_
+
 const int n_maps_layer = 3;
 const int n_intt_layer = 4;   // must be 0-4, setting this to zero will remove the INTT completely, n < 4 gives you the first n layers
 const int n_gas_layer = 60;
@@ -39,8 +41,8 @@ double Svtx(PHG4Reco* g4Reco, double radius,
       lyr->set_double_param("layer_nominal_radius",maps_layer_radius[ilayer]);// thickness in cm
 
       // The cell size is used only during pixilization of sensor hits, but it is convemient to set it now because the geometry object needs it
-      lyr->set_double_param("pixel_x",0.0020);// pitch in cm
-      lyr->set_double_param("pixel_z",0.0020);// length in cm
+      lyr->set_double_param("pixel_x",0.0030);// pitch in cm
+      lyr->set_double_param("pixel_z",0.0030);// length in cm
       lyr->set_double_param("pixel_thickness",0.0018);// thickness in cm
       lyr->set_double_param("phitilt",0.304);   // radians, equivalent to 17.4 degrees
 
@@ -231,11 +233,23 @@ void Svtx_Cells(int verbosity = 0)
     //  tpc_distortion -> setPrecision(1); // option to over write default  factors
   }
 
+#ifdef _USE_NEW_TPC_
+  PHG4CylinderCellTPCReco *svtx_cells = new PHG4CylinderCellTPCReco(n_maps_layer+n_intt_layer);
+  svtx_cells->Detector("SVTX");
+  svtx_cells->setDistortion(tpc_distortion);
+  svtx_cells->setDiffusionT(0.0120);
+  svtx_cells->setDiffusionL(0.0120);
+  svtx_cells->set_drift_velocity(6.0/1000.0l);
+  svtx_cells->setHalfLength( 105.5 );
+  svtx_cells->setElectronsPerKeV(28);
+  svtx_cells->Verbosity(0);
+#else
   PHG4CylinderCellTPCReco *svtx_cells = new PHG4CylinderCellTPCReco(n_maps_layer+n_intt_layer);
   svtx_cells->setDistortion(tpc_distortion); // apply TPC distrotion if tpc_distortion is not NULL
   svtx_cells->setDiffusion(diffusion);
   svtx_cells->setElectronsPerKeV(electrons_per_kev);
   svtx_cells->Detector("SVTX");
+#endif
 
   // The INTT ladder cell size is set in the detector construction code
 
@@ -364,10 +378,21 @@ void Svtx_Reco(int verbosity = 0)
 
   se->registerSubsystem( clusterizer );
 
+#ifdef _USE_NEW_TPC_
+  PHG4TPCClusterizer* tpcclusterizer = new PHG4TPCClusterizer();
+  tpcclusterizer->Verbosity(0);
+  tpcclusterizer->setEnergyCut(15/*adc*/);
+  tpcclusterizer->setRangeLayers(n_maps_layer+n_intt_layer,Max_si_layer);
+  tpcclusterizer->setFitWindowSigmas(0.0120,0.0120);
+  tpcclusterizer->setFitWindowMax(4/*rphibins*/,3/*zbins*/);
+  tpcclusterizer->setFitEnergyThreshold( 0.05 /*fraction*/ );
+  se->registerSubsystem( tpcclusterizer );
+#else
   PHG4TPCClusterizer* tpcclusterizer = new PHG4TPCClusterizer("PHG4TPCClusterizer",3,4,n_maps_layer+n_intt_layer,Max_si_layer-1);
   tpcclusterizer->setEnergyCut(20.0*45.0/n_gas_layer);
   tpcclusterizer->Verbosity(verbosity);
   se->registerSubsystem( tpcclusterizer );
+#endif
 
 
   //---------------------

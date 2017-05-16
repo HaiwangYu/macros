@@ -79,20 +79,22 @@ void RunKalmanPatRec(const int nevents = 0,
 #endif
 		kalman_pat_rec->set_do_evt_display(false);
 
+		kalman_pat_rec->set_init_direction(-1);
+
 		//! loose
-//	kalman_pat_rec->set_search_win_phi(100.);
-//	kalman_pat_rec->set_search_win_z(100.);
-//	kalman_pat_rec->set_max_incr_chi2(1000.);
-//	kalman_pat_rec->set_max_consecutive_missing_layer(67);
+		kalman_pat_rec->set_search_win_phi(1000.);
+		kalman_pat_rec->set_search_win_z(1000.);
+		kalman_pat_rec->set_max_incr_chi2(10000.);
+		kalman_pat_rec->set_max_consecutive_missing_layer(67);
 
 		//! nightly build 2017-05-04, 30GeV
-		kalman_pat_rec->set_search_win_phi(5.);
-		kalman_pat_rec->set_search_win_z(5.);
-		kalman_pat_rec->set_max_incr_chi2(20.);
-		kalman_pat_rec->set_max_consecutive_missing_layer(20);
-
-		kalman_pat_rec->set_max_splitting_chi2(0.);
-		kalman_pat_rec->set_min_good_track_hits(30);
+//		kalman_pat_rec->set_search_win_phi(5.);
+//		kalman_pat_rec->set_search_win_z(5.);
+//		kalman_pat_rec->set_max_incr_chi2(20.);
+//		kalman_pat_rec->set_max_consecutive_missing_layer(20);
+//
+//		kalman_pat_rec->set_max_splitting_chi2(0.);
+//		kalman_pat_rec->set_min_good_track_hits(30);
 
 		//! last working
 //	kalman_pat_rec->set_max_merging_dphi(0.0020);

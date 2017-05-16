@@ -1,9 +1,9 @@
 int Fun4All_single_particle (
-		const int nEvents = 2,
+		const int nEvents = 10,
 		const char * inputFile = NULL,
 		const char * outputFile = "SvtxClusters.root",
 		const char * embed_input_file = "Hijing_G4Hits.root",
-		const int which_tracking = 14,
+		const int which_tracking = 12,
 		const bool do_embedding = false
 		)
 {
@@ -441,6 +441,6 @@ int Fun4All_single_particle (
 	//getchar();
 
 	std::cout << "All done" << std::endl;
-	delete se;
-	gSystem->Exit(0);
+	//delete se;
+	//gSystem->Exit(0);
 }
