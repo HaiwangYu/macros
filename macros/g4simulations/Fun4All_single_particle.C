@@ -50,6 +50,11 @@ int Fun4All_single_particle (
 	bool do_svtx_track = true;
 	bool do_svtx_eval = true;
 
+	if(which_tracking == 14 || which_tracking == 15) {
+		do_svtx_track = false;
+		do_svtx_eval = false;
+	}
+
 	bool do_preshower = false;
 
 	bool do_cemc = false;
@@ -179,6 +184,7 @@ int Fun4All_single_particle (
 	{
 		// toss low multiplicity dummy events
 		PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
+		//gen->set_seed(1710374143);
 		// mu+,e+,proton,pi+,Upsilon
 		gen->add_particles("pi+",1);
 //		gen->add_particles("pi+",50);
