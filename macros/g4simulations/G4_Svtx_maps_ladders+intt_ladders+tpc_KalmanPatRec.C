@@ -33,8 +33,9 @@ double Svtx(PHG4Reco* g4Reco, double radius,
    
   for (int ilayer = 0; ilayer < n_maps_layer; ilayer++)
     {
+      if (verbosity)
       cout << "Create Maps layer " << ilayer  << " with radius " << maps_layer_radius[ilayer] << " mm, stave type " << stave_type[ilayer] 
-	   << " pixel thickness " << 0.0018 << endl;
+	   << " pixel size 30 x 30 microns " << " active pixel thickness 0.0018 microns" << endl;
 
       PHG4MapsSubsystem  *lyr = new PHG4MapsSubsystem("MAPS", ilayer, stave_type[ilayer]);
       lyr->Verbosity(verbosity);
@@ -42,8 +43,8 @@ double Svtx(PHG4Reco* g4Reco, double radius,
       lyr->set_double_param("layer_nominal_radius",maps_layer_radius[ilayer]);// thickness in cm
 
       // The cell size is used only during pixilization of sensor hits, but it is convemient to set it now because the geometry object needs it
-      lyr->set_double_param("pixel_x",0.0020);// pitch in cm
-      lyr->set_double_param("pixel_z",0.0020);// length in cm
+      lyr->set_double_param("pixel_x",0.0030);// pitch in cm
+      lyr->set_double_param("pixel_z",0.0030);// length in cm
       lyr->set_double_param("pixel_thickness",0.0018);// thickness in cm
       lyr->set_double_param("phitilt",0.304);   // radians, equivalent to 17.4 degrees
 
@@ -80,7 +81,8 @@ double Svtx(PHG4Reco* g4Reco, double radius,
 	{
 	  // We want the sPHENIX layer numbers for the INTT to be from n_maps_layer to n_maps_layer+n_intt_layer - 1
 	  vpair.push_back(std::make_pair(n_maps_layer+i, i));  // sphxlayer=n_maps_layer+i corresponding to inttlayer=i
-	  cout << "Create strip tracker layer " << vpair[i].second << " as  sphenix layer  "  << vpair[i].first << endl;
+
+    if (verbosity)	  cout << "Create strip tracker layer " << vpair[i].second << " as  sphenix layer  "  << vpair[i].first << endl;
 	}
       PHG4SiliconTrackerSubsystem *sitrack = new PHG4SiliconTrackerSubsystem("SILICON_TRACKER", vpair);
       sitrack->Verbosity(verbosity);
@@ -99,7 +101,7 @@ double Svtx(PHG4Reco* g4Reco, double radius,
   radius = inner_cage_radius;
   
   double n_rad_length_cage = 1.0e-02;
-  double cage_length = 160.; // rough length from Tom, also used in charge distortion calculation
+  double cage_length = 211.0; // From TPC group, gives eta = 1.1 at 78 cm radius
   double cage_thickness = 1.43 * n_rad_length_cage;
 
   // inner field cage  
@@ -139,8 +141,9 @@ double Svtx(PHG4Reco* g4Reco, double radius,
   
   for(int ilayer=n_maps_layer + n_intt_layer;ilayer<(n_maps_layer + n_intt_layer + npoints);++ilayer) {
 
-    cout << "Create TPC gas layer " << ilayer  << " with radius " << radius  << " cm " 
-	 << " thickness " << delta_radius - 0.01 << " length " << cage_length << endl;
+      if (verbosity)
+        cout << "Create TPC gas layer " << ilayer  << " with radius " << radius  << " cm "
+	       << " thickness " << delta_radius - 0.01 << " length " << cage_length << endl;
 
     cyl = new PHG4CylinderSubsystem("SVTX", ilayer);
     cyl->set_double_param("radius",radius);
@@ -192,14 +195,19 @@ void Svtx_Cells(int verbosity = 0)
   //-----------
 
   // MAPS cells
- PHG4MapsCellReco *maps_cells = new PHG4MapsCellReco("MAPS");
+  PHG4MapsCellReco *maps_cells = new PHG4MapsCellReco("MAPS");
   maps_cells->Verbosity(verbosity);
+  for(int ilayer = 0;ilayer < n_maps_layer;ilayer++)
+    {
+      maps_cells->set_timing_window(ilayer,-2000,2000);
+    }
   se->registerSubsystem(maps_cells);
 
   if(n_intt_layer > 0)
     {
       // INTT cells
       PHG4SiliconTrackerCellReco *reco = new PHG4SiliconTrackerCellReco("SILICON_TRACKER");
+      // The timing windows are hard-coded in the INTT ladder model
       reco->Verbosity(verbosity);
       se->registerSubsystem(reco);
     }
@@ -215,23 +223,23 @@ void Svtx_Cells(int verbosity = 0)
   double tpc_cell_y = 0.17;
   
   // Main switch for TPC distortion
-  const bool do_tpc_distoration = false;
+  const bool do_tpc_distortion = false;
   PHG4TPCSpaceChargeDistortion* tpc_distortion = NULL;
-  if (do_tpc_distoration) {
+  if (do_tpc_distortion) {
     if (inner_cage_radius != 20. && inner_cage_radius != 30.) {
-      cout << "Svtx_Cells - Fatal Error - TPC distoration required that "
+      cout << "Svtx_Cells - Fatal Error - TPC distortion required that "
               "inner_cage_radius is either 20 or 30 cm."
            << endl;
       exit(3);
     }
-    string TPC_distroation_file =
+    string TPC_distortion_file =
         string(getenv("CALIBRATIONROOT")) +
         Form("/Tracking/TPC/SpaceChargeDistortion/sPHENIX%.0f.root",
              inner_cage_radius);
     PHG4TPCSpaceChargeDistortion* tpc_distortion =
-        new PHG4TPCSpaceChargeDistortion(TPC_distroation_file);
-    //  tpc_distortion -> setAccuracy(0); // option to over write default  factors
-    //  tpc_distortion -> setPrecision(1); // option to over write default  factors
+        new PHG4TPCSpaceChargeDistortion(TPC_distortion_file);
+    //tpc_distortion -> setAccuracy(0); // option to over write default  factors
+    //tpc_distortion -> setPrecision(0.001); // option to over write default  factors      // default is 0.001
   }
 
 #ifdef _USE_NEW_TPC_
@@ -240,6 +248,8 @@ void Svtx_Cells(int verbosity = 0)
   svtx_cells->setDistortion(tpc_distortion);
   svtx_cells->setDiffusionT(0.0120);
   svtx_cells->setDiffusionL(0.0120);
+  svtx_cells->setSmearRPhi(0.09);  // additional smearing of cluster positions
+  svtx_cells->setSmearZ(0.06);
   svtx_cells->set_drift_velocity(6.0/1000.0l);
   svtx_cells->setHalfLength( 105.5 );
   svtx_cells->setElectronsPerKeV(28);
@@ -252,10 +262,8 @@ void Svtx_Cells(int verbosity = 0)
   svtx_cells->Detector("SVTX");
 #endif
 
-
-
+  // The maps cell size is set when the detector is constructed because it is needed by the geometry object
   // The INTT ladder cell size is set in the detector construction code
-
   // set cylinder cell TPC cell sizes
   for (int i=n_maps_layer + n_intt_layer;i<Max_si_layer;++i) {
     svtx_cells->cellsize(i, tpc_cell_x, tpc_cell_y);
@@ -386,7 +394,7 @@ void Svtx_Cluster(int verbosity = 0)
   tpcclusterizer->Verbosity(0);
   tpcclusterizer->setEnergyCut(15/*adc*/);
   tpcclusterizer->setRangeLayers(n_maps_layer+n_intt_layer,Max_si_layer);
-  tpcclusterizer->setFitWindowSigmas(0.0120,0.0120);
+  tpcclusterizer->setFitWindowSigmas(0.0150,0.0160);  // should be changed when TPC cluster resolution changes
   tpcclusterizer->setFitWindowMax(4/*rphibins*/,3/*zbins*/);
   tpcclusterizer->setFitEnergyThreshold( 0.05 /*fraction*/ );
   se->registerSubsystem( tpcclusterizer );
@@ -418,29 +426,33 @@ void Svtx_Reco(int verbosity = 0)
 		//---------------------
 		// PHG4KalmanPatRec
 		//---------------------
-		const int seeding_nlayer = 8;
-		const int min_seeding_nlayer = 6;
-		int seeding_layer[] = { 0, 1, 2, 7, 20, 35, 50, 66 };
+		const int seeding_nlayer = 7;
+		const int min_seeding_nlayer = 5;
+		int seeding_layer[] = {7,15,25,35,45,55,66};
 
-//	const int seeding_nlayer = 10;
-//	const int min_seeding_nlayer = 8;
-//	int seeding_layer[] = { 0,1,2,3,5,7,20,35,50,66 };
-
-//	const int seeding_nlayer = 8;
-//	const int min_seeding_nlayer = 8;
-//	int seeding_layer[] = { 0,1,2,3,5,7,30,60 };
-
-//	const int seeding_nlayer = 8;
-//	const int min_seeding_nlayer = 6;
-//	int seeding_layer[] = { 0,1,2,3,4,5,6,7 };
-
-//  const int seeding_nlayer = 7;
-//  const int min_seeding_nlayer = 7;
-//  int seeding_layer[] = {0, 1, 2, 3, 4, 5, 6};
-
-//	const int seeding_nlayer = 3;
-//	const int min_seeding_nlayer = 3;
-//	int seeding_layer[] = { 0,1,2 };
+//		const int seeding_nlayer = 8;
+//		const int min_seeding_nlayer = 6;
+//		int seeding_layer[] = { 0, 1, 2, 7, 20, 35, 50, 66 };
+//
+//		const int seeding_nlayer = 10;
+//		const int min_seeding_nlayer = 8;
+//		int seeding_layer[] = { 0,1,2,3,5,7,20,35,50,66 };
+//
+//		const int seeding_nlayer = 8;
+//		const int min_seeding_nlayer = 8;
+//		int seeding_layer[] = { 0,1,2,3,5,7,30,60 };
+//
+//		const int seeding_nlayer = 8;
+//		const int min_seeding_nlayer = 6;
+//		int seeding_layer[] = { 0,1,2,3,4,5,6,7 };
+//
+//		const int seeding_nlayer = 7;
+//		const int min_seeding_nlayer = 7;
+//		int seeding_layer[] = { 0, 1, 2, 3, 4, 5, 6 };
+//
+//		const int seeding_nlayer = 3;
+//		const int min_seeding_nlayer = 3;
+//		int seeding_layer[] = { 0,1,2 };
 
 		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec(seeding_nlayer,
 				min_seeding_nlayer);
@@ -473,28 +485,34 @@ void Svtx_Reco(int verbosity = 0)
 #endif
 		kalman_pat_rec->set_do_evt_display(false);
 
-		//! loose
-//	kalman_pat_rec->set_search_win_phi(100.);
-//	kalman_pat_rec->set_search_win_z(100.);
-//	kalman_pat_rec->set_max_incr_chi2(1000.);
-//	kalman_pat_rec->set_max_consecutive_missing_layer(67);
+		kalman_pat_rec->set_blowup_factor(1.);
+		kalman_pat_rec->set_init_direction(-1);
 
-		//! nightly build 2017-05-04, 30GeV
+		kalman_pat_rec->set_max_search_win_phi_tpc(    0.0040),
+		kalman_pat_rec->set_min_search_win_phi_tpc(    0.0000),
+		kalman_pat_rec->set_max_search_win_theta_tpc(  0.0040),
+		kalman_pat_rec->set_min_search_win_theta_tpc(  0.0000),
+
+		kalman_pat_rec->set_max_search_win_phi_intt(   0.0100),
+		kalman_pat_rec->set_min_search_win_phi_intt(   0.0000),
+		kalman_pat_rec->set_max_search_win_theta_intt( 1.0000),
+		kalman_pat_rec->set_min_search_win_theta_intt( 0.1000),
+
+		kalman_pat_rec->set_max_search_win_phi_maps(   0.0030),
+		kalman_pat_rec->set_min_search_win_phi_maps(   0.0000),
+		kalman_pat_rec->set_max_search_win_theta_maps( 0.0030),
+		kalman_pat_rec->set_min_search_win_theta_maps( 0.0000),
+
+		//!
 		kalman_pat_rec->set_search_win_phi(5.);
-		kalman_pat_rec->set_search_win_z(5.);
+		kalman_pat_rec->set_search_win_theta(5.);
 		kalman_pat_rec->set_max_incr_chi2(20.);
 		kalman_pat_rec->set_max_consecutive_missing_layer(20);
 
 		kalman_pat_rec->set_max_splitting_chi2(0.);
 		kalman_pat_rec->set_min_good_track_hits(30);
 
-		//! last working
-//	kalman_pat_rec->set_max_merging_dphi(0.0020);
-//	kalman_pat_rec->set_max_merging_deta(0.0010);
-//	kalman_pat_rec->set_max_merging_dr(  0.0050);
-//	kalman_pat_rec->set_max_merging_dz(  0.0050);
-
-		//! nightly build 2017-05-04
+		//!
 		kalman_pat_rec->set_max_merging_dphi(0.1000);
 		kalman_pat_rec->set_max_merging_deta(0.1000);
 		kalman_pat_rec->set_max_merging_dr(0.1000);

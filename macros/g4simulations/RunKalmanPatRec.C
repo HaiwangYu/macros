@@ -25,29 +25,33 @@ void RunKalmanPatRec(const int nevents = 0,
 		//---------------------
 		// PHG4KalmanPatRec
 		//---------------------
-	const int seeding_nlayer = 8;
-	const int min_seeding_nlayer = 6;
-	int seeding_layer[] = { 0, 1, 2, 7, 20, 35, 50, 66 };
+		const int seeding_nlayer = 7;
+		const int min_seeding_nlayer = 5;
+		int seeding_layer[] = {7,15,25,35,45,55,66};
 
-//	const int seeding_nlayer = 10;
-//	const int min_seeding_nlayer = 8;
-//	int seeding_layer[] = { 0,1,2,3,5,7,20,35,50,66 };
-
-//	const int seeding_nlayer = 8;
-//	const int min_seeding_nlayer = 8;
-//	int seeding_layer[] = { 0,1,2,3,5,7,30,60 };
-
-//	const int seeding_nlayer = 8;
-//	const int min_seeding_nlayer = 6;
-//	int seeding_layer[] = { 0,1,2,3,4,5,6,7 };
-
-//  const int seeding_nlayer = 7;
-//  const int min_seeding_nlayer = 7;
-//  int seeding_layer[] = {0, 1, 2, 3, 4, 5, 6};
-
-//	const int seeding_nlayer = 3;
-//	const int min_seeding_nlayer = 3;
-//	int seeding_layer[] = { 0,1,2 };
+//		const int seeding_nlayer = 8;
+//		const int min_seeding_nlayer = 6;
+//		int seeding_layer[] = { 0, 1, 2, 7, 20, 35, 50, 66 };
+//
+//		const int seeding_nlayer = 10;
+//		const int min_seeding_nlayer = 8;
+//		int seeding_layer[] = { 0,1,2,3,5,7,20,35,50,66 };
+//
+//		const int seeding_nlayer = 8;
+//		const int min_seeding_nlayer = 8;
+//		int seeding_layer[] = { 0,1,2,3,5,7,30,60 };
+//
+//		const int seeding_nlayer = 8;
+//		const int min_seeding_nlayer = 6;
+//		int seeding_layer[] = { 0,1,2,3,4,5,6,7 };
+//
+//		const int seeding_nlayer = 7;
+//		const int min_seeding_nlayer = 7;
+//		int seeding_layer[] = { 0, 1, 2, 3, 4, 5, 6 };
+//
+//		const int seeding_nlayer = 3;
+//		const int min_seeding_nlayer = 3;
+//		int seeding_layer[] = { 0,1,2 };
 
 		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec(seeding_nlayer,
 				min_seeding_nlayer);
@@ -81,24 +85,33 @@ void RunKalmanPatRec(const int nevents = 0,
 		kalman_pat_rec->set_do_evt_display(false);
 
 		kalman_pat_rec->set_blowup_factor(1.);
-		kalman_pat_rec->set_init_direction(1);
+		kalman_pat_rec->set_init_direction(-1);
+
+		kalman_pat_rec->set_max_search_win_phi_tpc(    0.0040),
+		kalman_pat_rec->set_min_search_win_phi_tpc(    0.0000),
+		kalman_pat_rec->set_max_search_win_theta_tpc(  0.0040),
+		kalman_pat_rec->set_min_search_win_theta_tpc(  0.0000),
+
+		kalman_pat_rec->set_max_search_win_phi_intt(   0.0100),
+		kalman_pat_rec->set_min_search_win_phi_intt(   0.0000),
+		kalman_pat_rec->set_max_search_win_theta_intt( 1.0000),
+		kalman_pat_rec->set_min_search_win_theta_intt( 0.1000),
+
+		kalman_pat_rec->set_max_search_win_phi_maps(   0.0030),
+		kalman_pat_rec->set_min_search_win_phi_maps(   0.0000),
+		kalman_pat_rec->set_max_search_win_theta_maps( 0.0030),
+		kalman_pat_rec->set_min_search_win_theta_maps( 0.0000),
 
 		//!
 		kalman_pat_rec->set_search_win_phi(5.);
-		kalman_pat_rec->set_search_win_z(5.);
+		kalman_pat_rec->set_search_win_theta(5.);
 		kalman_pat_rec->set_max_incr_chi2(20.);
 		kalman_pat_rec->set_max_consecutive_missing_layer(20);
 
 		kalman_pat_rec->set_max_splitting_chi2(0.);
 		kalman_pat_rec->set_min_good_track_hits(30);
 
-		//! last working
-//	kalman_pat_rec->set_max_merging_dphi(0.0020);
-//	kalman_pat_rec->set_max_merging_deta(0.0010);
-//	kalman_pat_rec->set_max_merging_dr(  0.0050);
-//	kalman_pat_rec->set_max_merging_dz(  0.0050);
-
-		//! nightly build 2017-05-04
+		//!
 		kalman_pat_rec->set_max_merging_dphi(0.1000);
 		kalman_pat_rec->set_max_merging_deta(0.1000);
 		kalman_pat_rec->set_max_merging_dr(0.1000);
@@ -133,7 +146,7 @@ void RunKalmanPatRec(const int nevents = 0,
 	kalman->set_over_write_svtxvertexmap(true);
 	kalman->set_do_eval(false);
 	kalman->set_eval_filename("PHG4TrackKalmanFitter_eval.root");
-	se->registerSubsystem(kalman);
+//	se->registerSubsystem(kalman);
 #endif
 
 	//---------------
