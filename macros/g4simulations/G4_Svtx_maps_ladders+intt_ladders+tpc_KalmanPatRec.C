@@ -408,121 +408,26 @@ void Svtx_Cluster(int verbosity = 0)
 
 void Svtx_Reco(int verbosity = 0)
 {
-  //---------------
-  // Load libraries
-  //---------------
+	//---------------
+	// Load libraries
+	//---------------
 
-  gSystem->Load("libfun4all.so");
-  gSystem->Load("libg4hough.so");
+	gSystem->Load("libfun4all.so");
+	gSystem->Load("libg4hough.so");
 
-  //---------------
-  // Fun4All server
-  //---------------
+	//---------------
+	// Fun4All server
+	//---------------
 
-  Fun4AllServer *se = Fun4AllServer::instance();
+	Fun4AllServer *se = Fun4AllServer::instance();
 
-  const bool use_kalman_pat_rec = true;
+	const bool use_kalman_pat_rec = true;
 	if (use_kalman_pat_rec) {
 		//---------------------
 		// PHG4KalmanPatRec
 		//---------------------
-		const int seeding_nlayer = 7;
-		const int min_seeding_nlayer = 5;
-		int seeding_layer[] = {7,15,25,35,45,55,66};
-
-//		const int seeding_nlayer = 8;
-//		const int min_seeding_nlayer = 6;
-//		int seeding_layer[] = { 0, 1, 2, 7, 20, 35, 50, 66 };
-//
-//		const int seeding_nlayer = 10;
-//		const int min_seeding_nlayer = 8;
-//		int seeding_layer[] = { 0,1,2,3,5,7,20,35,50,66 };
-//
-//		const int seeding_nlayer = 8;
-//		const int min_seeding_nlayer = 8;
-//		int seeding_layer[] = { 0,1,2,3,5,7,30,60 };
-//
-//		const int seeding_nlayer = 8;
-//		const int min_seeding_nlayer = 6;
-//		int seeding_layer[] = { 0,1,2,3,4,5,6,7 };
-//
-//		const int seeding_nlayer = 7;
-//		const int min_seeding_nlayer = 7;
-//		int seeding_layer[] = { 0, 1, 2, 3, 4, 5, 6 };
-//
-//		const int seeding_nlayer = 3;
-//		const int min_seeding_nlayer = 3;
-//		int seeding_layer[] = { 0,1,2 };
-
-		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec(seeding_nlayer,
-				min_seeding_nlayer);
-		kalman_pat_rec->set_seeding_layer(seeding_layer, seeding_nlayer);
-
-		kalman_pat_rec->set_mag_field(1.4);
-		kalman_pat_rec->Verbosity(10);
-		// ALICE ITS upgrade values for total thickness in X_0
-		kalman_pat_rec->set_material(0, 0.003);
-		kalman_pat_rec->set_material(1, 0.003);
-		kalman_pat_rec->set_material(2, 0.003);
-		kalman_pat_rec->set_material(3, 0.008);
-		kalman_pat_rec->set_material(4, 0.008);
-		kalman_pat_rec->set_material(5, 0.008);
-		kalman_pat_rec->set_material(6, 0.008);
-		kalman_pat_rec->setPtRescaleFactor(0.9972 / 1.00117);
-		kalman_pat_rec->set_chi2_cut_init(5.0);  // 5.0
-		kalman_pat_rec->set_chi2_cut_fast(10.0, 50.0, 75.0); // 10.0, 50.0, 75.0
-		kalman_pat_rec->set_chi2_cut_full(5.0); //5.0
-		kalman_pat_rec->set_ca_chi2_cut(5.0); //5.0
-		kalman_pat_rec->setMaxClusterError(3.0); //3.0
-		kalman_pat_rec->setRejectGhosts(false);
-		kalman_pat_rec->setRemoveHits(false);
-		kalman_pat_rec->setCutOnDCA(true);
-
-#ifdef _ONLY_SEEDING_
-		kalman_pat_rec->set_seeding_only_mode(true);
-#else
-		kalman_pat_rec->set_seeding_only_mode(false);
-#endif
-		kalman_pat_rec->set_do_evt_display(false);
-
-		kalman_pat_rec->set_blowup_factor(1.);
-		kalman_pat_rec->set_init_direction(-1);
-
-		kalman_pat_rec->set_max_search_win_phi_tpc(    0.0040),
-		kalman_pat_rec->set_min_search_win_phi_tpc(    0.0000),
-		kalman_pat_rec->set_max_search_win_theta_tpc(  0.0040),
-		kalman_pat_rec->set_min_search_win_theta_tpc(  0.0000),
-
-		kalman_pat_rec->set_max_search_win_phi_intt(   0.0100),
-		kalman_pat_rec->set_min_search_win_phi_intt(   0.0000),
-		kalman_pat_rec->set_max_search_win_theta_intt( 1.0000),
-		kalman_pat_rec->set_min_search_win_theta_intt( 0.1000),
-
-		kalman_pat_rec->set_max_search_win_phi_maps(   0.0030),
-		kalman_pat_rec->set_min_search_win_phi_maps(   0.0000),
-		kalman_pat_rec->set_max_search_win_theta_maps( 0.0030),
-		kalman_pat_rec->set_min_search_win_theta_maps( 0.0000),
-
-		//!
-		kalman_pat_rec->set_search_win_phi(5.);
-		kalman_pat_rec->set_search_win_theta(5.);
-		kalman_pat_rec->set_max_incr_chi2(20.);
-		kalman_pat_rec->set_max_consecutive_missing_layer(20);
-
-		kalman_pat_rec->set_max_splitting_chi2(0.);
-		kalman_pat_rec->set_min_good_track_hits(30);
-
-		//!
-		kalman_pat_rec->set_max_merging_dphi(0.1000);
-		kalman_pat_rec->set_max_merging_deta(0.1000);
-		kalman_pat_rec->set_max_merging_dr(0.1000);
-		kalman_pat_rec->set_max_merging_dz(0.1000);
-		kalman_pat_rec->set_max_share_hits(3); // tracks share more than this #hits are merged
-
-		//KalmanFitter, KalmanFitterRefTrack, DafSimple, DafRef
-//	kalman_pat_rec->set_track_fitting_alg_name("DafSimple");
-		kalman_pat_rec->set_track_fitting_alg_name("DafRef");
-
+		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec(
+				"PHG4KalmanPatRec");
 		se->registerSubsystem(kalman_pat_rec);
 
 	} else {
@@ -537,32 +442,24 @@ void Svtx_Reco(int verbosity = 0)
 	//---------------------
 	// Kalman Filter
 	//---------------------
-#ifdef _ONLY_SEEDING_
-#else
 	PHG4TrackKalmanFitter* kalman = new PHG4TrackKalmanFitter();
-	kalman->set_do_evt_display(false);
-	kalman->set_over_write_svtxtrackmap(true);
-	kalman->set_over_write_svtxvertexmap(true);
-	kalman->set_do_eval(false);
-	kalman->set_eval_filename("PHG4TrackKalmanFitter_eval.root");
 	se->registerSubsystem(kalman);
-#endif
-  
-  //------------------
-  // Track Projections
-  //------------------
+
+	//------------------
+	// Track Projections
+	//------------------
 //  PHG4SvtxTrackProjection* projection = new PHG4SvtxTrackProjection();
 //  projection->Verbosity(verbosity);
 //  se->registerSubsystem( projection );
 
-  //----------------------
-  // Beam Spot Calculation
-  //----------------------
-//  PHG4SvtxBeamSpotReco* beamspot = new PHG4SvtxBeamSpotReco();
-//  beamspot->Verbosity(verbosity);
-//  se->registerSubsystem( beamspot );
+	//----------------------
+	// Beam Spot Calculation
+	//----------------------
+	PHG4SvtxBeamSpotReco* beamspot = new PHG4SvtxBeamSpotReco();
+	beamspot->Verbosity(verbosity);
+	se->registerSubsystem(beamspot);
 
-  return;
+	return;
 }
 
 void G4_Svtx_Reco()
@@ -598,10 +495,10 @@ void Svtx_Eval(std::string outputfile, int verbosity = 0)
 
   SvtxEvaluator* eval = new SvtxEvaluator("SVTXEVALUATOR", outputfile.c_str());
   eval->do_cluster_eval(true);
-  eval->do_g4hit_eval(true);
+  eval->do_g4hit_eval(false);
   eval->do_hit_eval(false);
   eval->do_gpoint_eval(false);
-  eval->scan_for_embedded(false); // take all tracks if false - take only embedded tracks if true (will not record decay particles!! - loses Upsilon electrons)
+  eval->scan_for_embedded(true); // take all tracks if false - take only embedded tracks if true (will not record decay particles!! - loses Upsilon electrons)
   eval->Verbosity(verbosity);
   se->registerSubsystem( eval );
 
