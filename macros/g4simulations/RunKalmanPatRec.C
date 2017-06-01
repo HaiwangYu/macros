@@ -51,12 +51,34 @@ void RunKalmanPatRec(const int nevents = 0,
 //		const int min_seeding_nlayer = 5;
 //		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec(seeding_nlayer, min_seeding_nlayer);
 
-		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec(
-				"PHG4KalmanPatRec");
+		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec");
+//		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec", 1, 4, 60);
+
+
 //		kalman_pat_rec->Verbosity(100);
 
 //		int seeding_layers[] = {7,15,25,35,45,55,66};
 //		kalman_pat_rec->set_seeding_layer(seeding_layers, seeding_nlayer);
+//
+//		kalman_pat_rec->set_nlayers_all(67);
+//		int seeding_layers[] = {7,15,25,35,45,55,66};
+//		kalman_pat_rec->set_seeding_layer(seeding_layers, 7);
+//
+//		unsigned int maps_layers[] = {0, 1, 2};
+//		unsigned int intt_layers[] = {3, 4, 5, 6};
+//
+//		kalman_pat_rec->set_maps_layers(maps_layers, 3);
+//		kalman_pat_rec->set_intt_layers(intt_layers, 4);
+
+//		kalman_pat_rec->set_nlayers_all(65);
+//		int seeding_layers[] = {7,15,25,35,45,55,64};
+//		kalman_pat_rec->set_seeding_layer(seeding_layers, 7);
+//
+//		unsigned int maps_layers[] = {0};
+//		kalman_pat_rec->set_maps_layers(maps_layers, 1);
+//
+//		unsigned int intt_layers[] = {1, 2, 3, 4};
+//		kalman_pat_rec->set_intt_layers(intt_layers, 4);
 
 //		kalman_pat_rec->set_mag_field(1.4);
 //		kalman_pat_rec->setRejectGhosts(true);
@@ -83,7 +105,6 @@ void RunKalmanPatRec(const int nevents = 0,
 //#else
 //		kalman_pat_rec->set_seeding_only_mode(false);
 //#endif
-//		kalman_pat_rec->set_do_evt_display(false);
 
 //		kalman_pat_rec->set_blowup_factor(1.);
 //		kalman_pat_rec->set_init_direction(-1);
@@ -138,8 +159,8 @@ void RunKalmanPatRec(const int nevents = 0,
 #else
 	PHG4TrackKalmanFitter* kalman = new PHG4TrackKalmanFitter();
 //	kalman->Verbosity(100);
+//	kalman->set_do_evt_display(true);
 //	kalman->set_track_fitting_alg_name("DafRef");
-//	kalman->set_do_evt_display(false);
 //	kalman->set_over_write_svtxtrackmap(true);
 //	kalman->set_over_write_svtxvertexmap(true);
 //	kalman->set_do_eval(false);
@@ -157,6 +178,7 @@ void RunKalmanPatRec(const int nevents = 0,
 	gSystem->Load("libg4hough.so");
 	gSystem->Load("libg4eval.so");
 
+
 	//---------------
 	// Fun4All server
 	//---------------
@@ -167,13 +189,16 @@ void RunKalmanPatRec(const int nevents = 0,
 	// SVTX evaluation
 	//----------------
 
-	SvtxEvaluator* eval = new SvtxEvaluator("SVTXEVALUATOR",
-			g4svtx_eval_out_name);
+	//SvtxEvaluator* eval = new SvtxEvaluator("SVTXEVALUATOR",g4svtx_eval_out_name);
+
+	gSystem->Load("libSvtxEvaluatorHaiwang.so");
+	SvtxEvaluatorHaiwang* eval = new SvtxEvaluatorHaiwang("SVTXEVALUATOR",g4svtx_eval_out_name);
+
 	eval->do_cluster_eval(true);
 	eval->do_g4hit_eval(true);
 	eval->do_hit_eval(false);
 	eval->do_gpoint_eval(false);
-	eval->scan_for_embedded(true); // take all tracks if false - take only embedded tracks if true (will not record decay particles!! - loses Upsilon electrons)
+	eval->scan_for_embedded(false); // take all tracks if false - take only embedded tracks if true (will not record decay particles!! - loses Upsilon electrons)
 	eval->Verbosity(0);
 	se->registerSubsystem(eval);
 

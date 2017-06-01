@@ -187,8 +187,8 @@ int Fun4All_single_particle (
 		//gen->set_seed(1710374143);
 		// mu+,e+,proton,pi+,Upsilon
 		gen->add_particles("mu-",1);
-//		gen->add_particles("pi+",50);
-//		gen->add_particles("pi-",50);
+//		gen->add_particles("pi+",5);
+//		gen->add_particles("pi-",5);
 		if (readhepmc || do_embedding)
 		{
 			gen->set_reuse_existing_vertex(true);
@@ -208,7 +208,7 @@ int Fun4All_single_particle (
 		gen->set_phi_range(-1 * TMath::Pi(), 1 * TMath::Pi());
 //		gen->set_eta_range(0, 0);
 //		gen->set_phi_range(0, 0);
-		gen->set_pt_range(0.5,30);
+		gen->set_pt_range(0, 30);
 		gen->Embed(10);
 		gen->Verbosity(0);
 		if (! usegun)
@@ -232,14 +232,14 @@ int Fun4All_single_particle (
 			pgen->set_z_range(0,0);
 			pgen->set_eta_range(0.01,0.01);
 			pgen->set_mom_range(10,10);
-			pgen->set_phi_range(5.3./180.*TMath::Pi(),5.7./180.*TMath::Pi());
+			pgen->set_phi_range(5.3/180.*TMath::Pi(),5.3/180.*TMath::Pi());
 			se->registerSubsystem(pgen);
 			pgen = new PHG4ParticleGenerator();
 			pgen->set_name("geantino");
 			pgen->set_z_range(0,0);
 			pgen->set_eta_range(0.01,0.01);
 			pgen->set_mom_range(10,10);
-			pgen->set_phi_range(-0.2./180.*TMath::Pi(),0.2./180.*TMath::Pi());
+			pgen->set_phi_range(-0.2/180.*TMath::Pi(),0.2/180.*TMath::Pi());
 			se->registerSubsystem(pgen);
 		}
 	}
