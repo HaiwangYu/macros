@@ -414,7 +414,7 @@ void Svtx_Tracking(int verbosity = 0){
     // PHG4KalmanPatRec
     //---------------------
 
-    PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec");
+	PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec", n_maps_layer, n_intt_layer, n_gas_layer);
     se->registerSubsystem(kalman_pat_rec);
 
   } else {
