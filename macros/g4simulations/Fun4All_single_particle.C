@@ -300,8 +300,8 @@ int Fun4All_single_particle (
 	//--------------
 
 	if(which_tracking == 14 || which_tracking == 15) {
-		if (do_svtx_cluster) Svtx_Cluster();
-		if (do_svtx_track) Svtx_Reco();
+		if (do_svtx_cluster) Svtx_Clustering();
+		if (do_svtx_track) Svtx_Tracking();
 	} else {
 		if (do_svtx_cluster || do_svtx_track) Svtx_Reco();
 	}

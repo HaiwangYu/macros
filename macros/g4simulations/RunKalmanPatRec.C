@@ -159,7 +159,7 @@ void RunKalmanPatRec(const int nevents = 0,
 #else
 	PHG4TrackKalmanFitter* kalman = new PHG4TrackKalmanFitter();
 //	kalman->Verbosity(100);
-//	kalman->set_do_evt_display(true);
+	kalman->set_do_evt_display(true);
 //	kalman->set_track_fitting_alg_name("DafRef");
 //	kalman->set_over_write_svtxtrackmap(true);
 //	kalman->set_over_write_svtxvertexmap(true);
