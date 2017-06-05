@@ -208,7 +208,7 @@ int Fun4All_single_particle (
 		gen->set_phi_range(-1 * TMath::Pi(), 1 * TMath::Pi());
 //		gen->set_eta_range(0, 0);
 //		gen->set_phi_range(0, 0);
-		gen->set_pt_range(0, 30);
+		gen->set_pt_range(1, 1);
 		gen->Embed(10);
 		gen->Verbosity(0);
 		if (! usegun)

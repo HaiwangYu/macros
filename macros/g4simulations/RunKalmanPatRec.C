@@ -51,8 +51,8 @@ void RunKalmanPatRec(const int nevents = 0,
 //		const int min_seeding_nlayer = 5;
 //		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec(seeding_nlayer, min_seeding_nlayer);
 
-		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec");
-//		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec", 1, 4, 60);
+//		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec");
+		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec", 0, 4, 60);
 
 
 //		kalman_pat_rec->Verbosity(100);
