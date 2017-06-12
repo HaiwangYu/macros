@@ -5,9 +5,11 @@
  */
 
 //#define _ONLY_SEEDING_
-void RunKalmanPatRec(const int nevents = 0,
-		const bool use_kalman_pat_rec = true, const char* input =
-				"SvtxClusters.root", const char* output = "SvtxTracks.root",
+void RunKalmanPatRec(
+		const int nevents = 0,
+		const bool use_kalman_pat_rec = true,
+		const char* input = "SvtxClusters.root",
+		const char* output = "SvtxTracks.root",
 		const char* g4svtx_eval_out_name = "g4svtx_eval.root") {
 
 	gSystem->Load("libphool.so");
@@ -52,8 +54,9 @@ void RunKalmanPatRec(const int nevents = 0,
 //		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec(seeding_nlayer, min_seeding_nlayer);
 
 //		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec");
-		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec", 0, 4, 60);
+		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec", 3, 4, 60);
 
+		kalman_pat_rec->set_analyzing_mode(false);
 
 //		kalman_pat_rec->Verbosity(100);
 
@@ -158,8 +161,9 @@ void RunKalmanPatRec(const int nevents = 0,
 #ifdef _ONLY_SEEDING_
 #else
 	PHG4TrackKalmanFitter* kalman = new PHG4TrackKalmanFitter();
-//	kalman->Verbosity(100);
-	kalman->set_do_evt_display(true);
+	kalman->set_use_truth_vertex(true);
+	kalman->Verbosity(100);
+//	kalman->set_do_evt_display(true);
 //	kalman->set_track_fitting_alg_name("DafRef");
 //	kalman->set_over_write_svtxtrackmap(true);
 //	kalman->set_over_write_svtxvertexmap(true);
@@ -192,13 +196,14 @@ void RunKalmanPatRec(const int nevents = 0,
 	//SvtxEvaluator* eval = new SvtxEvaluator("SVTXEVALUATOR",g4svtx_eval_out_name);
 
 	gSystem->Load("libSvtxEvaluatorHaiwang.so");
-	SvtxEvaluatorHaiwang* eval = new SvtxEvaluatorHaiwang("SVTXEVALUATOR",g4svtx_eval_out_name);
+	//SvtxEvaluatorHaiwang* eval = new SvtxEvaluatorHaiwang("SVTXEVALUATOR",g4svtx_eval_out_name);
+	SvtxEvaluator* eval = new SvtxEvaluator("SVTXEVALUATOR",g4svtx_eval_out_name);
 
 	eval->do_cluster_eval(true);
 	eval->do_g4hit_eval(true);
 	eval->do_hit_eval(false);
 	eval->do_gpoint_eval(false);
-	eval->scan_for_embedded(false); // take all tracks if false - take only embedded tracks if true (will not record decay particles!! - loses Upsilon electrons)
+	eval->scan_for_embedded(true); // take all tracks if false - take only embedded tracks if true (will not record decay particles!! - loses Upsilon electrons)
 	eval->Verbosity(0);
 	se->registerSubsystem(eval);
 

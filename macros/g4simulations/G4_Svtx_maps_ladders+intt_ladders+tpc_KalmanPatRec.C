@@ -1,6 +1,6 @@
 #include <vector>
 
-const int n_maps_layer = 0;
+const int n_maps_layer = 3;
 const int n_intt_layer = 4;   // must be 0-4, setting this to zero will remove the INTT completely, n < 4 gives you the first n layers
 const int n_gas_layer = 60;
 double inner_cage_radius = 20.;
@@ -223,7 +223,7 @@ void Svtx_Cells(int verbosity = 0)
   double tpc_cell_y = 0.17;
   
   // Main switch for TPC distortion
-  const bool do_tpc_distortion = true;
+  const bool do_tpc_distortion = false;
   PHG4TPCSpaceChargeDistortion* tpc_distortion = NULL;
   if (do_tpc_distortion) {
     if (inner_cage_radius != 20. && inner_cage_radius != 30.) {
@@ -495,7 +495,7 @@ void Svtx_Eval(std::string outputfile, int verbosity = 0)
   eval->do_g4hit_eval(false);
   eval->do_hit_eval(false);
   eval->do_gpoint_eval(false);
-  eval->scan_for_embedded(false); // take all tracks if false - take only embedded tracks if true (will not record decay particles!! - loses Upsilon electrons)
+  eval->scan_for_embedded(true); // take all tracks if false - take only embedded tracks if true (will not record decay particles!! - loses Upsilon electrons)
   eval->Verbosity(verbosity);
   se->registerSubsystem( eval );
 
