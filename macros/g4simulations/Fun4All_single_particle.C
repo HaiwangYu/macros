@@ -186,7 +186,7 @@ int Fun4All_single_particle (
 		PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
 		//gen->set_seed(1710374143);
 		// mu+,e+,proton,pi+,Upsilon
-		gen->add_particles("mu-",1);
+		gen->add_particles("mu-",2);
 //		gen->add_particles("pi+",100);
 //		gen->add_particles("pi-",100);
 		if (readhepmc || do_embedding)
@@ -199,7 +199,7 @@ int Fun4All_single_particle (
 			gen->set_vertex_distribution_function(PHG4SimpleEventGenerator::Uniform,
 					PHG4SimpleEventGenerator::Uniform,
 					PHG4SimpleEventGenerator::Uniform);
-			gen->set_vertex_distribution_mean(0.0, 0.0, 0.0);
+			gen->set_vertex_distribution_mean(0.0, 0.0, 5.0);
 			gen->set_vertex_distribution_width(0.0, 0.0, 0.0);
 		}
 		gen->set_vertex_size_function(PHG4SimpleEventGenerator::Uniform);

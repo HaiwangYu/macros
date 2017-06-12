@@ -56,8 +56,9 @@ void RunKalmanPatRec(
 //		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec");
 		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec", 3, 4, 60);
 
-		kalman_pat_rec->set_analyzing_mode(false);
-
+//		kalman_pat_rec->set_vertex_error(0.0500);
+//		kalman_pat_rec->set_analyzing_mode(false);
+//
 //		kalman_pat_rec->Verbosity(100);
 
 //		int seeding_layers[] = {7,15,25,35,45,55,66};
@@ -161,13 +162,14 @@ void RunKalmanPatRec(
 #ifdef _ONLY_SEEDING_
 #else
 	PHG4TrackKalmanFitter* kalman = new PHG4TrackKalmanFitter();
+	kalman->set_fit_primary_tracks(true);
 	kalman->set_use_truth_vertex(true);
-	kalman->Verbosity(100);
+//	kalman->Verbosity(100);
 //	kalman->set_do_evt_display(true);
 //	kalman->set_track_fitting_alg_name("DafRef");
 //	kalman->set_over_write_svtxtrackmap(true);
 //	kalman->set_over_write_svtxvertexmap(true);
-//	kalman->set_do_eval(false);
+//	kalman->set_do_eval(true);
 //	kalman->set_eval_filename("PHG4TrackKalmanFitter_eval.root");
 
 	se->registerSubsystem(kalman);
@@ -197,7 +199,7 @@ void RunKalmanPatRec(
 
 	gSystem->Load("libSvtxEvaluatorHaiwang.so");
 	//SvtxEvaluatorHaiwang* eval = new SvtxEvaluatorHaiwang("SVTXEVALUATOR",g4svtx_eval_out_name);
-	SvtxEvaluator* eval = new SvtxEvaluator("SVTXEVALUATOR",g4svtx_eval_out_name);
+	SvtxEvaluator* eval = new SvtxEvaluator("SVTXEVALUATOR",g4svtx_eval_out_name,"PrimaryTrackMap");
 
 	eval->do_cluster_eval(true);
 	eval->do_g4hit_eval(true);
@@ -216,9 +218,9 @@ void RunKalmanPatRec(
 		in->AddListFile(input);
 	se->registerInputManager(in);
 
-//	Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT",
-//			output);
-//	se->registerOutputManager(out);
+	Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT",
+			output);
+	se->registerOutputManager(out);
 
 	se->run(nevents);
 
