@@ -192,7 +192,7 @@ int Fun4All_Hijing_Cluster(
 		gen->set_vertex_size_parameters(0.0, 0.0);
 		gen->set_eta_range(-0.5, 0.5);
 		gen->set_phi_range(-1.0 * TMath::Pi(), 1.0 * TMath::Pi());
-		gen->set_pt_range(1, 1);
+		gen->set_pt_range(5, 5);
 		gen->Embed(10);
 		gen->Verbosity(0);
 		if (! usegun)

@@ -47,7 +47,7 @@ int Fun4All_Embedding(
 	bool do_svtx = true;
 	bool do_svtx_cell = do_svtx && true;
 	bool do_svtx_track = do_svtx_cell && true;
-	bool do_svtx_eval = do_svtx_track && false;
+	bool do_svtx_eval = do_svtx_track && true;
 
 	bool do_preshower = false;
 
