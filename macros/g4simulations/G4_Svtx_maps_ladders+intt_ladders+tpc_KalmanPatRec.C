@@ -477,7 +477,7 @@ void Svtx_Reco(int verbosity = 0)
   //------------------
   // Track Projections
   //------------------
-    PHG4SvtxTrackProjection* projection = new PHG4SvtxTrackProjection();
+    PHG4GenFitTrackProjection* projection = new PHG4GenFitTrackProjection();
     projection->Verbosity(verbosity);
     se->registerSubsystem( projection );
 
