@@ -1,9 +1,10 @@
 int Fun4All_Hijing_Cluster(
 		const int nEvents = 1,
 		const char * inputFile = "/sphenix/user/belmonrj/HIJING_a/hijing_00005.txt.bz2",
+		//const char * inputFile = "/sphenix/user/isibf5y/Hijing_midcentral/hijing_00000.txt.bz2",
 		const char * outputFile = "SvtxClusters.root",
 		const char * embed_input_file = NULL,
-		const int which_tracking = 14
+		const int which_tracking = 15
 		)
 {
 	//===============
@@ -48,8 +49,8 @@ int Fun4All_Hijing_Cluster(
 	bool do_svtx = true;
 	bool do_svtx_cell = true;
 	bool do_svtx_cluster = true;
-	bool do_svtx_track = false;
-	bool do_svtx_eval = false;
+	bool do_svtx_track = true;
+	bool do_svtx_eval = true;
 
 	bool do_preshower = false;
 
@@ -109,7 +110,7 @@ int Fun4All_Hijing_Cluster(
 	//---------------
 
 	Fun4AllServer *se = Fun4AllServer::instance();
-	se->Verbosity(0);
+	se->Verbosity(100);
 	// just if we set some flags somewhere in this macro
 	recoConsts *rc = recoConsts::instance();
 	// By default every random number generator uses
@@ -190,9 +191,9 @@ int Fun4All_Hijing_Cluster(
 		}
 		gen->set_vertex_size_function(PHG4SimpleEventGenerator::Uniform);
 		gen->set_vertex_size_parameters(0.0, 0.0);
-		gen->set_eta_range(-0.5, 0.5);
+		gen->set_eta_range(-1, 1);
 		gen->set_phi_range(-1.0 * TMath::Pi(), 1.0 * TMath::Pi());
-		gen->set_pt_range(5, 5);
+		gen->set_pt_range(1,1);
 		gen->Embed(10);
 		gen->Verbosity(0);
 		if (! usegun)
@@ -283,12 +284,14 @@ int Fun4All_Hijing_Cluster(
 	// SVTX tracking
 	//--------------
 
-	if(which_tracking == 14 || which_tracking == 15) {
-		if (do_svtx_cluster) Svtx_Clustering();
-		if (do_svtx_track) Svtx_Tracking();
-	} else {
-		if (do_svtx_cluster || do_svtx_track) Svtx_Reco();
-	}
+//	if(which_tracking == 14 || which_tracking == 15) {
+//		if (do_svtx_cluster) Svtx_Clustering();
+//		if (do_svtx_track) Svtx_Tracking();
+//	} else {
+//		if (do_svtx_cluster || do_svtx_track) Svtx_Reco();
+//	}
+
+	if (do_svtx_cluster || do_svtx_track) Svtx_Reco();
 
 	//-----------------
 	// Global Vertexing

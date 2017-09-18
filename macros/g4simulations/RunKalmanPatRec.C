@@ -54,8 +54,8 @@ void RunKalmanPatRec(
 //		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec(seeding_nlayer, min_seeding_nlayer);
 
 //		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec");
-		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec", 3, 4, 60);
-//		kalman_pat_rec->Verbosity(100);
+		PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec", 3, 4, 40);
+		kalman_pat_rec->Verbosity(100);
 
 //		kalman_pat_rec->set_min_nlayers_seeding(4);
 
@@ -168,7 +168,7 @@ void RunKalmanPatRec(
 //	kalman->set_fit_primary_tracks(true);
 //	kalman->set_use_truth_vertex(true);
 //	kalman->Verbosity(100);
-//	kalman->set_do_evt_display(true);
+	kalman->set_do_evt_display(true);
 //	kalman->set_track_fitting_alg_name("DafRef");
 //	kalman->set_over_write_svtxtrackmap(true);
 //	kalman->set_over_write_svtxvertexmap(true);
