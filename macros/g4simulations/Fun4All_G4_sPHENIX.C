@@ -27,7 +27,7 @@ int Fun4All_G4_sPHENIX(
   const bool readhepmc = false;  // read HepMC files
   // Or:
   // Use pythia
-  const bool runpythia8 = false;
+  const bool runpythia8 = true;
   const bool runpythia6 = false;
   //
   // **** And ****
@@ -38,7 +38,7 @@ int Fun4All_G4_sPHENIX(
 
   // Besides the above flags. One can further choose to further put in following particles in Geant4 simulation
   // Use multi-particle generator (PHG4SimpleEventGenerator), see the code block below to choose particle species and kinematics
-  const bool particles = true && !readhits;
+  const bool particles = false && !readhits;
   // or gun/ very simple single particle gun generator
   const bool usegun = false && !readhits;
   // Throw single Upsilons, may be embedded in Hijing by setting readhepmc flag also  (note, careful to set Z vertex equal to Hijing events)
@@ -51,7 +51,7 @@ int Fun4All_G4_sPHENIX(
   // What to run
   //======================
 
-  bool do_bbc = true;
+  bool do_bbc = false;
 
   bool do_pipe = true;
 
@@ -62,28 +62,28 @@ int Fun4All_G4_sPHENIX(
 
   bool do_pstof = false;
 
-  bool do_cemc = true;
-  bool do_cemc_cell = do_cemc && true;
-  bool do_cemc_twr = do_cemc_cell && true;
-  bool do_cemc_cluster = do_cemc_twr && true;
-  bool do_cemc_eval = do_cemc_cluster && true;
+  bool do_cemc = false;
+  bool do_cemc_cell = do_cemc && false;
+  bool do_cemc_twr = do_cemc_cell && false;
+  bool do_cemc_cluster = do_cemc_twr && false;
+  bool do_cemc_eval = do_cemc_cluster && false;
 
-  bool do_hcalin = true;
-  bool do_hcalin_cell = do_hcalin && true;
-  bool do_hcalin_twr = do_hcalin_cell && true;
-  bool do_hcalin_cluster = do_hcalin_twr && true;
-  bool do_hcalin_eval = do_hcalin_cluster && true;
+  bool do_hcalin = false;
+  bool do_hcalin_cell = do_hcalin && false;
+  bool do_hcalin_twr = do_hcalin_cell && false;
+  bool do_hcalin_cluster = do_hcalin_twr && false;
+  bool do_hcalin_eval = do_hcalin_cluster && false;
 
-  bool do_magnet = true;
+  bool do_magnet = false;
 
-  bool do_hcalout = true;
-  bool do_hcalout_cell = do_hcalout && true;
-  bool do_hcalout_twr = do_hcalout_cell && true;
-  bool do_hcalout_cluster = do_hcalout_twr && true;
-  bool do_hcalout_eval = do_hcalout_cluster && true;
+  bool do_hcalout = false;
+  bool do_hcalout_cell = do_hcalout && false;
+  bool do_hcalout_twr = do_hcalout_cell && false;
+  bool do_hcalout_cluster = do_hcalout_twr && false;
+  bool do_hcalout_eval = do_hcalout_cluster && false;
 
   bool do_global = true;
-  bool do_global_fastsim = true;
+  bool do_global_fastsim = false;
 
   bool do_calotrigger = true && do_cemc_twr && do_hcalin_twr && do_hcalout_twr;
 
@@ -172,6 +172,13 @@ int Fun4All_G4_sPHENIX(
       if (readhepmc)
         pythia8->set_reuse_vertex(0);  // reuse vertex of subevent with embedding ID of 0
       // pythia8->set_vertex_distribution_width(0,0,10,0); // additional vertex smearing if needed, more vertex options available
+
+			PHPy8JetTrigger *theTrigger = new PHPy8JetTrigger();
+			theTrigger->SetEtaHighLow(-1, 1);
+			theTrigger->SetJetR(.4);
+			theTrigger->SetMinJetPt(15);
+			pythia8->register_trigger(theTrigger);
+
       se->registerSubsystem(pythia8);
     }
 
@@ -505,9 +512,48 @@ int Fun4All_G4_sPHENIX(
                 /*bool*/ do_hcalout_twr);
   }
 
-  //  Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", outputFile);
-  // if (do_dst_compress) DstCompress(out);
-  //  se->registerOutputManager(out);
+  // HF jet trigger moudle
+  if (gSystem->Load("libHFJetTruthGeneration") == 0)
+    {
+      if (do_jet_reco)
+        {
+          HFJetTruthTrigger * jt = new HFJetTruthTrigger(
+              "HFJetTruthTrigger.root_r07",5 , "AntiKt_Truth_r07");
+					//jt->Verbosity(HFJetTruthTrigger::VERBOSITY_MORE);
+          jt->set_pt_min(10);
+          jt->set_eta_min(-4);
+          jt->set_eta_max(4);
+          se->registerSubsystem(jt);
+
+          HFJetTruthTrigger * jt = new HFJetTruthTrigger(
+              "HFJetTruthTrigger.root_r04",5 , "AntiKt_Truth_r04");
+          //jt->Verbosity(HFJetTruthTrigger::VERBOSITY_MORE);
+          jt->set_pt_min(10);
+          jt->set_eta_min(-4);
+          jt->set_eta_max(4);
+          se->registerSubsystem(jt);
+
+          HFJetTruthTrigger * jt = new HFJetTruthTrigger(
+              "HFJetTruthTrigger.root_r02",5 , "AntiKt_Truth_r02");
+					//jt->Verbosity(HFJetTruthTrigger::VERBOSITY_MORE);MORE);
+          jt->set_pt_min(10);
+          jt->set_eta_min(-4);
+          jt->set_eta_max(4);
+          se->registerSubsystem(jt);
+        }
+    }
+
+    // High DCA track counting
+  if (gSystem->Load("libBJetModule") == 0)
+  {
+    BJetModule *tm = new BJetModule( "BJetModule", "HFtag.root" );
+    se->registerSubsystem( tm );
+  }
+
+
+  //Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", outputFile);
+  //if (do_dst_compress) DstCompress(out);
+  //se->registerOutputManager(out);
 
   //-----------------
   // Event processing
