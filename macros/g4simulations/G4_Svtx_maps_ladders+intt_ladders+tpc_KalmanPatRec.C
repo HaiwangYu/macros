@@ -6,9 +6,9 @@ bool tpc_layers_40  = false;
 // if true, refit tracks with primary vertex included in track fit  - good for analysis of prompt tracks only
 // Adds second node to node tree, keeps original track node undisturbed
 // Adds second evaluator to process refitted tracks and outputs separate ntuples
-bool use_primary_vertex = false;
+bool use_primary_vertex = true;
 
-const int n_maps_layer = 3;  // must be 0-3, setting it to zero removes MVTX completely, n < 3 gives the first n layers
+const int n_maps_layer = 0;  // must be 0-3, setting it to zero removes MVTX completely, n < 3 gives the first n layers
 const int n_intt_layer = 4;  // must be 0-4, setting this to zero will remove the INTT completely, n < 4 gives you the first n layers
 
 int n_tpc_layer_inner = 16;
@@ -292,7 +292,7 @@ double Svtx(PHG4Reco* g4Reco, double radius,
     radius = intt_radius_max * 0.1;
   }
 
-//  int verbosity = 1;
+  int verbosity = 1;
 
   // time projection chamber layers --------------------------------------------
 
@@ -712,6 +712,7 @@ void Svtx_Reco(int verbosity = 0)
 
     PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec", n_maps_layer, n_intt_layer, n_gas_layer);
     kalman_pat_rec->Verbosity(0);
+    kalman_pat_rec->set_n_iterations(1);  // temporary !!!!
     se->registerSubsystem(kalman_pat_rec);
   }
   else
