@@ -2,6 +2,7 @@
 using namespace std;
 
 int Fun4All_G4_sPHENIX(
+		const int nParticles = 5000,
     const int proc = 0,
     const int nEvents = 1,
     const char *inputFile = "/sphenix/data/data02/review_2017-08-02/single_particle/spacal2d/fieldmap/G4Hits_sPHENIX_e-_eta0_8GeV-0002.root",
@@ -23,7 +24,7 @@ int Fun4All_G4_sPHENIX(
   const bool readhits = false;
   // Or:
   // read files in HepMC format (typically output from event generators like hijing or pythia)
-  const bool readhepmc = true;  // read HepMC files
+  const bool readhepmc = false;  // read HepMC files
   // Or:
   // Use pythia
   const bool runpythia8 = false;
@@ -41,10 +42,10 @@ int Fun4All_G4_sPHENIX(
   // or gun/ very simple single particle gun generator
   const bool usegun = false && !readhits;
   // Throw single Upsilons, may be embedded in Hijing by setting readhepmc flag also  (note, careful to set Z vertex equal to Hijing events)
-  const bool upsilons = true && !readhits;
+  const bool upsilons = false && !readhits;
   // Event pile up simulation with collision rate in Hz MB collisions.
   // Note please follow up the macro to verify the settings for beam parameters
-  const double pileup_collision_rate = 200e3;  // 100e3 for 100kHz nominal AuAu collision rate.
+  const double pileup_collision_rate = 0;  // 100e3 for 100kHz nominal AuAu collision rate.
 
   //======================
   // What to run
@@ -194,7 +195,7 @@ int Fun4All_G4_sPHENIX(
       // toss low multiplicity dummy events
       PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
       //gen->add_particles("pi-", 1);  // mu+,e+,proton,pi+,Upsilon
-      gen->add_particles("pi+",100); // 100 pion option
+      gen->add_particles("pi+",nParticles); // 100 pion option
       if (readhepmc || do_embedding || runpythia8 || runpythia6)
       {
         gen->set_reuse_existing_vertex(true);
@@ -537,6 +538,7 @@ int Fun4All_G4_sPHENIX(
   //-----
 
   se->End();
+	se->PrintTimer();
   std::cout << "All done" << std::endl;
   delete se;
   gSystem->Exit(0);
