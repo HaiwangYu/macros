@@ -711,7 +711,7 @@ void Svtx_Reco(int verbosity = 0)
     //---------------------
 
     PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec", n_maps_layer, n_intt_layer, n_gas_layer);
-    kalman_pat_rec->Verbosity(0);
+    kalman_pat_rec->Verbosity(100);
     kalman_pat_rec->set_n_iterations(1);  // temporary !!!!
     se->registerSubsystem(kalman_pat_rec);
   }
@@ -786,10 +786,12 @@ void Svtx_Eval(std::string outputfile, int verbosity = 0)
 
   SvtxEvaluator* eval;
   eval = new SvtxEvaluator("SVTXEVALUATOR", outputfile.c_str());
-  eval->do_cluster_eval(true);
-  eval->do_g4hit_eval(true);
-  eval->do_hit_eval(true);  // enable to see the hits that includes the chamber physics...
+  eval->do_cluster_eval(false);
+  eval->do_g4hit_eval(false);
+  eval->do_hit_eval(false);  // enable to see the hits that includes the chamber physics...
   eval->do_gpoint_eval(false);
+  eval->do_gtrack_eval(true);
+  eval->do_track_eval(true);
   eval->scan_for_embedded(false);  // take all tracks if false - take only embedded tracks if true
   eval->Verbosity(verbosity);
   se->registerSubsystem(eval);
