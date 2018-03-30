@@ -711,7 +711,8 @@ void Svtx_Reco(int verbosity = 0)
     //---------------------
 
     PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec", n_maps_layer, n_intt_layer, n_gas_layer);
-    kalman_pat_rec->Verbosity(100);
+    kalman_pat_rec->set_track_fitting_alg_name("KalmanFitter");
+    kalman_pat_rec->Verbosity(0);
     kalman_pat_rec->set_n_iterations(1);  // temporary !!!!
     se->registerSubsystem(kalman_pat_rec);
   }
@@ -729,6 +730,7 @@ void Svtx_Reco(int verbosity = 0)
   //---------------------
 
   PHG4TrackKalmanFitter* kalman = new PHG4TrackKalmanFitter();
+  //kalman->set_track_fitting_alg_name("KalmanFitter");
   kalman->Verbosity(0);
   if (use_primary_vertex)
     kalman->set_fit_primary_tracks(true);  // include primary vertex in track fit if true
