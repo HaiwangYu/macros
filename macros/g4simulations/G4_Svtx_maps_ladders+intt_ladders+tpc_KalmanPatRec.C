@@ -79,7 +79,7 @@ double TPCShapingRMSTail;
 double tpc_cell_z;
 double TPC_SmearRPhi;
 double TPC_SmearZ;
-
+double TPCPeaking;
 int Max_si_layer;
 
 void SvtxInit(int verbosity = 0)
@@ -178,22 +178,58 @@ void SvtxInit(int verbosity = 0)
   }
 
   TPC_ElectronsPerKeV = TPC_NTot / TPC_dEdx;
-
+  
   // TPC readout shaping time and ADC clock parameters
   // these set the Z size of the TPC cells
   //=======================================
-  // TPCShapingRMSLead = 32.0;  // ns, rising RMS equivalent of shaping amplifier for 80 ns SAMPA
-  // TPCShapingRMSTail = 48.0;  // ns, falling RMS equivalent of shaping amplifier for 80 ns SAMPA
   TPCADCClock = 53.0;                           // ns, corresponds to an ADC clock rate of 18.8 MHz
-  TPCShapingRMSLead = 16.0;                     // ns, rising RMS equivalent of shaping amplifier for 40 ns SAMPA
-  TPCShapingRMSTail = 24.0;                     // ns, falling RMS equivalent of shaping amplifier for 40 ns SAMPA
+  TPCPeaking = 50;  // SAMPA peaking time: use 160, 80, 50
+  if(TPCPeaking == 160)
+    {
+      TPCShapingRMSLead = 64.0;  // ns, rising RMS equivalent of shaping amplifier for 160 ns SAMPA
+      TPCShapingRMSTail = 96.0;  // ns, falling RMS equivalent of shaping amplifier for 160 ns SAMPA
+      TPC_SmearRPhi = 0.25;  
+      TPC_SmearZ = 0.08;  
+    }
+  else if(TPCPeaking == 80)
+    { 
+      TPCShapingRMSLead = 32.0;  // ns, rising RMS equivalent of shaping amplifier for 80 ns SAMPA
+      TPCShapingRMSTail = 48.0;  // ns, falling RMS equivalent of shaping amplifier for 80 ns SAMPA 
+      TPC_SmearRPhi = 0.25;  // changed before processing 80 ns on 3/19, with 100 pions it gives 160, 151, 145 microns for inner, mid, outer TPC
+      TPC_SmearZ = 0.15;  // changed before processing 80 ns on 3/19, with 100 pions it gives 500 microns
+    }
+  else if(TPCPeaking == 50)
+    {
+      TPCShapingRMSLead = 20.0;                     // ns, rising RMS equivalent of shaping amplifier for 50 ns SAMPA
+      TPCShapingRMSTail = 30.0;                     // ns, falling RMS equivalent of shaping amplifier for 50 ns SAMPA
+      TPC_SmearRPhi = 0.25; 
+      TPC_SmearZ = 0.22; 
+    }
+  else if(TPCPeaking == 40)
+    {
+      TPCShapingRMSLead = 16.0;                     // ns, rising RMS equivalent of shaping amplifier for 40 ns SAMPA
+      TPCShapingRMSTail = 24.0;                     // ns, falling RMS equivalent of shaping amplifier for 40 ns SAMPA
+      TPC_SmearRPhi = 0.25; 
+      TPC_SmearZ = 0.25; 
+    }
+  else
+    {
+      cout << " need to specify SAMPA chip peaking time of 160, 80, 50, or 40 ns" << endl;
+      exit(1);
+    }
   tpc_cell_z = TPCADCClock * TPCDriftVelocity;  // cm
-
+  
   //  TKH does not understand the physical origin of these parameters.
   //  however, their impact seems quite small...
   //  these are tuned to give 150 microns r-phi and 500 microns Z resolution in the outer TPC layers with the TPC setup used here
-  TPC_SmearRPhi = 0.215;
-  TPC_SmearZ = 0.20;
+
+
+
+ 
+
+
+
+
 }
 
 double Svtx(PHG4Reco* g4Reco, double radius,
@@ -292,7 +328,7 @@ double Svtx(PHG4Reco* g4Reco, double radius,
     radius = intt_radius_max * 0.1;
   }
 
-//  int verbosity = 1;
+  int verbosity = 1;
 
   // time projection chamber layers --------------------------------------------
 
@@ -578,7 +614,7 @@ void Svtx_Cells(int verbosity = 0)
   return;
 }
 
-void Svtx_Reco(int verbosity = 0)
+void Svtx_Reco(int verbosity = 0, double vertex_error_xy = 0.0100, double vertex_error_z = 0.0100)
 {
   //---------------
   // Load libraries
@@ -698,7 +734,8 @@ void Svtx_Reco(int verbosity = 0)
   tpcclusterizer->setRangeLayers(n_maps_layer + n_intt_layer, Max_si_layer);
   tpcclusterizer->setEnergyCut(15 /*adc*/);
   tpcclusterizer->setFitWindowSigmas(0.0150, 0.0160);  // should be changed when TPC cluster resolution changes
-  tpcclusterizer->setFitWindowMax(5 /*rphibins*/, 5 /*zbins*/);
+  //tpcclusterizer->setFitWindowMax(5 /*rphibins*/, 5 /*zbins*/);
+  tpcclusterizer->setFitWindowMax(7 /*rphibins*/, 5 /*zbins*/);
   tpcclusterizer->setFitEnergyThreshold(0.05 /*fraction*/);
   se->registerSubsystem(tpcclusterizer);
 
@@ -710,8 +747,10 @@ void Svtx_Reco(int verbosity = 0)
     // PHG4KalmanPatRec
     //---------------------
 
-    PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec", n_maps_layer, n_intt_layer, n_gas_layer);
-    kalman_pat_rec->Verbosity(0);
+    PHG4KalmanPatRec* kalman_pat_rec = new PHG4KalmanPatRec("PHG4KalmanPatRec", n_maps_layer, n_intt_layer, n_gas_layer, vertex_error_xy, vertex_error_z);
+		//kalman_pat_rec->setCutOnDCA(false);
+    kalman_pat_rec->Verbosity(2);
+    //kalman_pat_rec->set_n_iterations(1);  // temporary !!!!
     se->registerSubsystem(kalman_pat_rec);
   }
   else
@@ -784,12 +823,12 @@ void Svtx_Eval(std::string outputfile, int verbosity = 0)
   //----------------
 
   SvtxEvaluator* eval;
-  eval = new SvtxEvaluator("SVTXEVALUATOR", outputfile.c_str());
+  eval = new SvtxEvaluator("SVTXEVALUATOR", outputfile.c_str(), "SvtxTrackMap", n_maps_layer, n_intt_layer, n_gas_layer);
   eval->do_cluster_eval(true);
-  eval->do_g4hit_eval(true);
-  eval->do_hit_eval(true);  // enable to see the hits that includes the chamber physics...
+  eval->do_g4hit_eval(false);
+  eval->do_hit_eval(false);  // enable to see the hits that includes the chamber physics...
   eval->do_gpoint_eval(false);
-  eval->scan_for_embedded(false);  // take all tracks if false - take only embedded tracks if true
+  eval->scan_for_embedded(true);  // take all tracks if false - take only embedded tracks if true
   eval->Verbosity(verbosity);
   se->registerSubsystem(eval);
 
@@ -798,9 +837,9 @@ void Svtx_Eval(std::string outputfile, int verbosity = 0)
     // make a second evaluator that records tracks fitted with primary vertex included
     // good for analysis of prompt tracks, particularly if MVTX is not present
     SvtxEvaluator* evalp;
-    evalp = new SvtxEvaluator("SVTXEVALUATOR", string(outputfile.c_str()) + "_primary_eval.root", "PrimaryTrackMap");
-    evalp->do_cluster_eval(true);
-    evalp->do_g4hit_eval(true);
+    evalp = new SvtxEvaluator("SVTXEVALUATOR", string(outputfile.c_str()) + "_primary_eval.root", "PrimaryTrackMap", n_maps_layer, n_intt_layer, n_gas_layer);
+    evalp->do_cluster_eval(false);
+    evalp->do_g4hit_eval(false);
     evalp->do_hit_eval(false);
     evalp->do_gpoint_eval(false);
     evalp->scan_for_embedded(true);  // take all tracks if false - take only embedded tracks if true
